@@ -3,9 +3,10 @@ data "google_project" "project" {}
 data "local_file" "cluster-name"{
   filename = "./../terraform-data/cluster-name.tfdata"
 }
-resource "google_sourcerepo_repository" "new_git_repository" {
-  name = "${local.local-repository}"
-}
+# TODO: Can only do this when the provider can create a mirrored repo not just blank
+# resource "google_sourcerepo_repository" "new_git_repository" {
+#   name = "${local.local-repository}"
+# }
 
 resource "google_cloudbuild_trigger" "new_git_build_trigger" {
   count       = "${length(local.local-triggers)}"
@@ -25,8 +26,9 @@ resource "google_cloudbuild_trigger" "new_git_build_trigger" {
 
   filename = "cloudbuild.yaml"
 
-  # Google Git repository has been created.
-  depends_on = [
-    "google_sourcerepo_repository.new_git_repository",
-  ]
+#TODO: Can only re enable when the provider can create a mirrored repo
+  # # Google Git repository has been created.
+  # depends_on = [
+  #   "google_sourcerepo_repository.new_git_repository",
+  # ]
 }

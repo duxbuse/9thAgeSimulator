@@ -42,7 +42,7 @@ func TestHandler(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	expected := `Serving Hello World Page\n For other pages please go to /dice or /clasher`
+	expected := `For other pages please go to /dice or /clasher`
 	actual := recorder.Body.String()
 	if actual != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v", actual, expected)

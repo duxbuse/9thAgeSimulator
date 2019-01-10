@@ -5,7 +5,7 @@ variable "password" {
   default = "adminpassword1234567890"
 }
 variable "project" {
-  default = "diceroller-220503"
+  default = "rosy-element-228200"
 }
 resource "local_file" "project" {
   content  = "${var.project}"
@@ -28,7 +28,7 @@ resource "local_file" "zone" {
   filename = "./../terraform-data/zone.tfdata"
 }
 variable "deployment-name" {
-  default = "diceroller"
+  default = "github_duxbuse_9thAgeSimulator"
 }
 resource "local_file" "deployment-name" {
   content  = "${var.deployment-name}"

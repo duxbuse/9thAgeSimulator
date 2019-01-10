@@ -1,5 +1,5 @@
 resource "google_container_cluster" "primary" {
-  name                     = "diceroller-cluster"
+  name                     = "battlesim-cluster"
   remove_default_node_pool = true
   initial_node_count = 3
 

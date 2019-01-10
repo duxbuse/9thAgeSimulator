@@ -6,25 +6,25 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/duxbuse/LogisticsMaps"
+	"github.com/duxbuse/Utilities"
 )
 
 
 func diceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving DiceRoller Page\n")
-	logisticsmaps.RenderDiceRoller(w, r, "dice")
+	Utilities.RenderDiceRoller(w, r, "dice")
 }
 
 //Dummy page to use for testing
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving Hello World")
 
-	fmt.Fprintf(w, "Serving Hello World Page\n For other pages please go to /dice or /clasher")
+	fmt.Fprintf(w, "For other pages please go to /dice or /clasher")
 }
 
 func clasherHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving Clasher Page\n")
-	logisticsmaps.RenderClasher(w, r, "clasher")
+	Utilities.RenderClasher(w, r, "clasher")
 }
 
 func main() {
