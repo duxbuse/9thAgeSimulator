@@ -1,0 +1,31 @@
+steps:
+#Build diceroller image from google source repository
+# add tags for the hash, branch as well as latest
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build',
+        '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME:$REVISION_ID',
+        '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME:${_TAG}',
+        '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME:latest',
+        '.']
+  timeout: 180s
+
+#push image to GCR with tags for the SHA, git branch and latest
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME:$REVISION_ID"]
+
+# Template out kubernetes deployment yaml
+- name: 'duxbuse/envsubst'
+  args: ['./k8s/diceroller-deployment.yml', './k8s/diceroller-deployment.yml']
+  env: ['tag=$REVISION_ID']
+
+#intialise kubernetes with deployment yaml
+#your clould build service account will also need permissions to deploy to GKE
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', './k8s/diceroller-deployment.yml']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_COMPUTE_ZONE}' 
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}'
+
+tags: ["$REVISION_ID", "${_TAG}", "latest"]
+# push to gcr and make avaliable as
+images: ["gcr.io/$PROJECT_ID/$REPO_NAME:$REVISION_ID", "gcr.io/$PROJECT_ID/$REPO_NAME:${_TAG}", "gcr.io/$PROJECT_ID/$REPO_NAME:latest"]

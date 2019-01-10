@@ -1,0 +1,20 @@
+#This is for when you want to run this locally.
+version: "3"
+services:
+  web:
+    image: duxbuse/diceroller
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+    #map from host:4000 -> container:9000
+      - "9000:9000"
+    networks:
+      - webnet
+networks:
+  webnet:

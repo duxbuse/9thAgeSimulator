@@ -1,0 +1,97 @@
+<style>
+legend {
+    background-color: #000;
+    color: #fff;
+    padding: 3px 6px;
+}
+fieldset{
+    margin: 5px;
+    width: 250px;
+}
+
+.output {
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+input {
+    margin: .4rem;
+}
+.section{
+    padding: 0px 5px 5px 5px;
+    -moz-box-shadow: 1px 2px 3px rgba(0,0,0,.5);
+    -webkit-box-shadow: 1px 2px 3px rgba(0,0,0,.5);
+    box-shadow: 1px 2px 3px rgba(0,0,0,.5);
+}
+.master{
+    width: 300px;
+}
+
+textarea {
+    resize: none;
+    overflow: hidden;
+    font-weight:bold;
+    text-align: left;
+}
+</style>
+<div class="master">
+
+
+    <div class="section">
+        <h1>Enter Inputs</h1>
+
+        <form action="/dice/" method="POST">
+            <fieldset>
+                <legend>Result Needed {2-12}</legend>
+                <input name="threshold" onfocus="this.value=''"
+                    value="{{.Threshold}}">
+            </fieldset>
+
+            <fieldset>
+                <legend>Select Direction (Inclusive)</legend>
+                <div>
+                    <input type="radio" id="forward" name="direction"
+                    onfocus="this.value=''"value="true" {{if .Forward}}checked{{end}} />
+                    <label for="forward">Above</label>
+                </div>
+
+                <div>
+                    <input type="radio" id="forward" name="direction"
+                        value="false" {{if not .Forward}}checked{{end}} />
+                    <label for="forward">Below</label>
+                </div>
+
+
+            </fieldset>
+
+            <fieldset>
+                <legend>Instances of Minimise</legend>
+                <input name="min" onfocus="this.value=''" value="{{.Min}}">
+            </fieldset>
+
+            <fieldset>
+                <legend>Instances of Maximise</legend>
+                <input name="max" onfocus="this.value=''" value="{{.Max}}">
+            </fieldset>
+            <fieldset>
+                <legend>Rerolls</legend>
+                <div>
+                    <input type="checkbox" id="reroll" name="reroll"
+                        value="false" {{if .Reroll}}checked{{end}} />
+                    <label for="reroll"> True</label>
+                </div>
+            </fieldset>
+            <input type="submit" value="Roll the Dice">
+        </form>
+    </div>
+
+
+    <div class="section">
+        <h1> Results</h1>
+        <fieldset>
+            <legend>Chance of success</legend>
+            <textarea readonly rows="1" cols="6">{{.Result}}%</textarea>
+        </fieldset>
+
+    </div>
+
+</div>

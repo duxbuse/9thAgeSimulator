@@ -1,0 +1,194 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/clasher.css">
+    <script src="/js/onload.js"></script>
+    <script src="/js/changeRace.js"></script>
+</head>
+
+<body>
+<!--TODO: Add checkboxes for commnad (champion standard) As well as charging-->
+
+    <div class="master">
+        <div class="section">
+            <h1>Clasher</h1>
+
+            <form action="/clasher/" method="POST">
+                <fieldset>
+                    <legend>Friendly Unit stats</legend>
+
+                    <table id="friend" border="1" cellpadding="3%">
+                        <tr>
+                            {{range $index, $element := .UnitData.RawStats}}
+                            {{if not ($element.IsEnemy $index)}}
+                            <th>{{.Name}}</th>
+                            {{end}}
+                            {{end}}
+                        </tr>
+                        <tr>
+                            {{range $index, $element := .UnitData.RawStats}}
+                            {{if not ($element.IsEnemy $index)}}
+                            <td><input name="{{$index}}" onfocus="this.value=''" value="{{.Value}}"></td>
+                            {{end}}
+                            {{end}}
+                        </tr>
+                    </table>
+                    <p></p>
+
+                    <label>Unit Height</label>
+                    <select name="FHeightSelect">
+                        <!-- $. is used to reach global scop inside range block -->
+                        {{range $index, $element := .UnitData.Height}}
+                        <option value="{{$index}}" {{if eq ($index) ($.UnitData.SecondaryStats.FHeightSelect.Value) }}
+                            selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Unit Type</label>
+                    <select name="FTypeSelect">
+                        {{range $index, $element := .UnitData.Type}}
+                        <option value="{{$index}}" {{if eq ($index) ( $.UnitData.SecondaryStats.FTypeSelect.Value) }}
+                            selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Base width</label>
+                    <select name="FWidthSelect">
+                        {{range $index, $element := .UnitData.Width}}
+                        <option value="{{$index}}" {{if eq ($index) (($.UnitData.SecondaryStats.FWidthSelect.Value)) }}
+                            selected {{end}}>{{$element}}mm</option> {{end}}
+                    </select>
+                    <label>Weapon</label>
+                    <select name="FWeaponSelect">
+                        {{range $index, $element := .UnitData.Weapon}}
+                        <option value="{{$index}}"
+                            {{if eq ($index) (($.UnitData.SecondaryStats.FWeaponSelect.Value)) }} selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Specialties</legend>
+                    <label>Race</label>
+                    <select name="FRaceSelect" onchange="changeRace()">
+                        {{range $index, $element := .UnitData.Races}}
+                        <option value="{{$index}}"{{if eq ($index) ($.UnitData.SecondaryStats.FRaceSelect.Value) }}
+                        selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Specialties</label>
+                    {{range $index, $element := .UnitData.SpecialtiesStats}}
+
+                    {{ $combine := (printf "F%v" $index) }}
+
+                    <div class="FSpecialties {{$element}}" style="display: none">
+                        <input type="checkbox" id="{{$index}}" name="F{{$index}}" {{if (index $.UnitData.SpecialtiesStatsOn $combine) }}
+                        checked
+                       {{end}}>
+                        <label for="F{{$index}}">{{$index}}</label>
+                    </div>
+                    {{end}}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Enemy Unit stats</legend>
+
+                    <table id="enemy" border="1" cellpadding="3%">
+                        <tr>
+                            {{range $index, $element := .UnitData.RawStats}}
+                            {{if ($element.IsEnemy $index)}}
+                            <th>{{.Name}}</th>
+                            {{end}}
+                            {{end}}
+                        </tr>
+                        <tr>
+                            {{range $index, $element := .UnitData.RawStats}}
+                            {{if ($element.IsEnemy $index)}}
+                            <td><input name="{{$index}}" onfocus="this.value=''" value="{{.Value}}"></td>
+                            {{end}}
+                            {{end}}
+                        </tr>
+                    </table>
+                    <p></p>
+
+                    <label>Unit Height</label>
+                    <select name="EHeightSelect">
+                        {{range $index, $element := .UnitData.Height}}
+                        <option value="{{$index}}" {{if eq ($index) ($.UnitData.SecondaryStats.EHeightSelect.Value) }}
+                            selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Unit Type</label>
+                    <select name="ETypeSelect">
+                        {{range $index, $element := .UnitData.Type}}
+                        <option value="{{$index}}" {{if eq ($index) ($.UnitData.SecondaryStats.ETypeSelect.Value) }}
+                            selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Base width</label>
+                    <select name="EWidthSelect">
+                        {{range $index, $element := .UnitData.Width}}
+                        <option value="{{$index}}" {{if eq ($index) ($.UnitData.SecondaryStats.EWidthSelect.Value) }}
+                            selected {{end}}>{{$element}}mm</option>
+                        {{end}}
+                    </select>
+                    <label>Weapon</label>
+                    <select name="EWeaponSelect">
+                        {{range $index, $element := .UnitData.Weapon}}
+                        <option value="{{$index}}"
+                            {{if eq ($index) (($.UnitData.SecondaryStats.EWeaponSelect.Value)) }} selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Specialties</legend>
+                    <label>Race</label>
+                    <select name="ERaceSelect" onchange="changeRace()">
+                        {{range $index, $element := .UnitData.Races}}
+                        <option value="{{$index}}"{{if eq ($index) ($.UnitData.SecondaryStats.ERaceSelect.Value) }}
+                        selected {{end}}>{{$element}}</option>
+                        {{end}}
+                    </select>
+                    <label>Specialties</label>
+                    {{range $index, $element := .UnitData.SpecialtiesStats}}
+                    {{ $combine := (printf "E%v" $index) }}
+                    <div class="ESpecialties {{$element}}" style="display: none">
+                        <input type="checkbox" id="{{$index}}" name="E{{$index}}" {{if (index $.UnitData.SpecialtiesStatsOn $combine) }}
+                        checked
+                       {{end}}>
+                        <label for="E{{$index}}">{{$index}}</label>
+                    </div>
+                    {{end}}
+                </fieldset>
+                <input style="width: auto" type="submit" value="Roll the Dice">
+            </form>
+        </div>
+
+
+        <div class="section">
+            <h1> Results</h1>
+            <fieldset>
+                <legend>Results</legend>
+                <table name="results" border="1" cellpadding="3%">
+                    <tr>
+                        <th>Who wins?</th>
+                        <th>Won by</th>
+                        <th>Break Chance</th>
+                        <th>Friend Remaining</th>
+                        <th>Enemy Remaining</th>
+                    </tr>
+                    <tr>
+                        <th><textarea readonly rows="1" cols="6">{{if .FightResults.WINNER}}Friendly{{else}}Enemy{{end}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.FightResults.AMMOUNT}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.FightResults.BreakChance}}%</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.FightResults.FNUM}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.FightResults.ENUM}}</textarea></th>
+                    </tr>
+                </table>
+            </fieldset>
+
+        </div>
+
+    </div>
+</body>
+
+</html>

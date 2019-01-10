@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diceroller-deployment
+spec:
+  selector:
+    matchLabels:
+      app: diceroller-deployment
+  template:
+    metadata:
+      labels:
+        app: diceroller-deployment
+    spec:
+      containers:
+      - name: diceroller-deployment
+        # This image need to be in a public repo.
+        # $tag is substituted from envsubst shell command
+        image: gcr.io/diceroller-220503/diceroller:$tag
+        ports:
+        - containerPort: 9000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "0.5"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: diceroller-service
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  type: LoadBalancer
+  selector:
+    app: diceroller-deployment
+  ports:
+  - port: 80
+    targetPort: 9000
+
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: diceroller-ingress
+spec:
+  backend:
+    serviceName: diceroller-service
+    servicePort: 80
