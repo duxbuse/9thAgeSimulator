@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: diceroller-deployment
+  name: battlesim-deployment
 spec:
   selector:
     matchLabels:
-      app: diceroller-deployment
+      app: battlesim-deployment
   template:
     metadata:
       labels:
-        app: diceroller-deployment
+        app: battlesim-deployment
     spec:
       containers:
-      - name: diceroller-deployment
+      - name: battlesim-deployment
         # This image need to be in a public repo.
         # $tag is substituted from envsubst shell command
-        image: gcr.io/diceroller-220503/diceroller:$tag
+        image: gcr.io/rosy-element-228200/github_duxbuse_9thagesimulator:$tag
         ports:
         - containerPort: 9000
         resources:
@@ -27,13 +27,13 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: diceroller-service
+  name: battlesim-service
   annotations:
     cloud.google.com/load-balancer-type: "Internal"
 spec:
   type: LoadBalancer
   selector:
-    app: diceroller-deployment
+    app: battlesim-deployment
   ports:
   - port: 80
     targetPort: 9000
@@ -42,8 +42,8 @@ spec:
 kind: Ingress
 apiVersion: extensions/v1beta1
 metadata:
-  name: diceroller-ingress
+  name: battlesim-ingress
 spec:
   backend:
-    serviceName: diceroller-service
+    serviceName: battlesim-service
     servicePort: 80

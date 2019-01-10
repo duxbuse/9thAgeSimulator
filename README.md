@@ -49,6 +49,8 @@ To view the app you will need to extract the `Endpoint` Ip address from the ingr
 **What you get at the end:**
 At the end of this you will have a CI pipe line that will run go tests before building go code and loading it into a lightweight alpine image and deploying to the cluster everytime there is a push to the master branch of your repository.
 
+For new project the kubernetes deployment yaml needs to point to the new GCR created for your project so with will need to be updated if you spin this up yourself
+
 ## Debugging
 It is helpfull to run dry build of the cloud builder
 `cloud-build-local --dryrun=false --substitutions=REPO_NAME='test-repo',REVISION_ID='test-revision'  .`
