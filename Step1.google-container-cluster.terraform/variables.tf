@@ -28,7 +28,7 @@ resource "local_file" "zone" {
   filename = "./../terraform-data/zone.tfdata"
 }
 variable "deployment-name" {
-  default = "github_duxbuse_9thAgeSimulator"
+  default = "github_duxbuse_9thagesimulator"
 }
 resource "local_file" "deployment-name" {
   content  = "${var.deployment-name}"
