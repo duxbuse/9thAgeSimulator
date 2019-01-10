@@ -19,8 +19,8 @@ EXPOSE 9000
 WORKDIR /root/
 #copy binary across
 COPY --from=builder /go/bin/ /cmd
-#copy html across
-COPY views /views
+#copy html and static assets across
+COPY public /public
 WORKDIR /cmd/
 #run server
 CMD ["./server"]
