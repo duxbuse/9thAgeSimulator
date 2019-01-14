@@ -15,7 +15,7 @@ func TestRollDice(t *testing.T) {
 
 func Test7s(t *testing.T) {
 	// Rolling 2 dice with no modifiers will sum to 7, 58% of the time
-	expected := 58.00
+	expected := 57.00
 	recieved := math.Floor(ChanceOfSuccess(7, true, false, 0, 0) * 100)
 	if recieved != expected {
 		t.Errorf("Calculated wrong Value, got: %.2f, want: %.2f.", recieved, expected)
@@ -50,31 +50,31 @@ func TestChanceOfSuccess(t *testing.T) {
 		{3, true, true, 0, 1, 9999},  //Charge=3, maximised 1, reroll
 		{3, true, false, 0, 2, 9992}, //Charge=3, maximised 2
 		{3, true, true, 0, 2, 9999},  //Charge=3, maximised 2, reroll
-		{3, true, false, 1, 0, 9259}, //Charge=3, minimised 1
+		{3, true, false, 1, 0, 9249}, //Charge=3, minimised 1
 		{3, true, true, 1, 0, 9945},  //Charge=3, minimised 1, reroll
-		{3, true, false, 2, 0, 8681}, //Charge=3, minimised 2
+		{3, true, false, 2, 0, 8641}, //Charge=3, minimised 2
 		{3, true, true, 2, 0, 9826},  //Charge=3, minimised 2, reroll
 
-		{7, true, false, 0, 0, 5833}, //Charge=7
-		{7, true, true, 0, 0, 8263},  //Charge=7, reroll
-		{7, true, false, 0, 1, 8046}, //Charge=7, maximised 1
+		{7, true, false, 0, 0, 5863}, //Charge=7
+		{7, true, true, 0, 0, 8363},  //Charge=7, reroll
+		{7, true, false, 0, 1, 8056}, //Charge=7, maximised 1
 		{7, true, true, 0, 1, 9622},  //Charge=7, maximised 1, reroll
 		{7, true, false, 0, 2, 9097}, //Charge=7, maximised 2
 		{7, true, true, 0, 2, 9918},  //Charge=7, maximised 2, reroll
-		{7, true, false, 1, 0, 3194}, //Charge=7, minimised 1
-		{7, true, true, 1, 0, 5367},  //Charge=7, minimised 1, reroll
-		{7, true, false, 2, 0, 1736}, //Charge=7, minimised 2
-		{7, true, true, 2, 0, 3171},  //Charge=7, minimised 2, reroll
+		{7, true, false, 1, 0, 3144}, //Charge=7, minimised 1
+		{7, true, true, 1, 0, 5467},  //Charge=7, minimised 1, reroll
+		{7, true, false, 2, 0, 1536}, //Charge=7, minimised 2
+		{7, true, true, 2, 0, 3371},  //Charge=7, minimised 2, reroll
 
-		{9, true, false, 0, 0, 2778}, //Charge=9
-		{9, true, true, 0, 0, 4784},  //Charge=9, reroll
-		{9, true, false, 0, 1, 5231}, //Charge=9, maximised 1
+		{9, true, false, 0, 0, 2978}, //Charge=9
+		{9, true, true, 0, 0, 4644},  //Charge=9, reroll
+		{9, true, false, 0, 1, 4931}, //Charge=9, maximised 1
 		{9, true, true, 0, 1, 7725},  //Charge=9, maximised 1, reroll
-		{9, true, false, 0, 2, 6944}, //Charge=9, maximised 2
+		{9, true, false, 0, 2, 6744}, //Charge=9, maximised 2
 		{9, true, true, 0, 2, 9066},  //Charge=9, maximised 2, reroll
-		{9, true, false, 1, 0, 1065}, //Charge=9, minimised 1
-		{9, true, true, 1, 0, 2016},  //Charge=9, minimised 1, reroll
-		{9, true, false, 2, 0, 401},  //Charge=9, minimised 2
+		{9, true, false, 1, 0, 1045}, //Charge=9, minimised 1
+		{9, true, true, 1, 0, 2116},  //Charge=9, minimised 1, reroll
+		{9, true, false, 2, 0, 501},  //Charge=9, minimised 2
 		{9, true, true, 2, 0, 786},   //Charge=9, minimised 2, reroll
 
 		{13, true, false, 0, 0, 0}} //blank case

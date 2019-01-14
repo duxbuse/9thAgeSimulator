@@ -9,8 +9,12 @@ import (
 	"testing"
 )
 
-func TestFight(t *testing.T) {
+func init() {
 	rand.Seed(9001) //This is critical to make sure the tests pass no matter where they are run.
+
+}
+
+func TestFight(t *testing.T) {
 
 	Tests := map[int]Results{}
 
@@ -82,9 +86,9 @@ func TestFight(t *testing.T) {
 
 	outcome1 := Outcome{
 		WINNER:      true,
-		AMMOUNT:     2,
-		BreakChance: "58.34",
-		FNUM:        18,
+		AMMOUNT:     3,
+		BreakChance: "72.50",
+		FNUM:        17,
 		ENUM:        22}
 
 	avgOutcome1 := Outcome{ //this is currently not checked and hence doesnt matter
@@ -119,8 +123,8 @@ func TestFight(t *testing.T) {
 	outcome2 := Outcome{
 		WINNER:      true,
 		AMMOUNT:     6,
-		BreakChance: "91.64",
-		FNUM:        20,
+		BreakChance: "92.20",
+		FNUM:        18,
 		ENUM:        3}
 
 	avgOutcome2 := Outcome{ //this is currently not checked and hence doesnt matter. But I did the maths and this is correct.
@@ -169,150 +173,6 @@ func TestCombatRes(t *testing.T) {
 		}
 	}
 }
-
-// func TestHitChance(t *testing.T) {
-// 	var Tests = []struct {
-// 		//inputs
-// 		FOFF      int
-// 		EDEF      int
-// 		parry     bool
-// 		rerollINC int
-// 		modifier  int
-
-// 		expected float64 // expected result
-// 	}{
-// 		{0, 0, false, 0, 0, 3.0 / 6.0},   //blank
-// 		{10, 10, false, 0, 0, 3.0 / 6.0}, //10-10
-// 		{10, 8, false, 0, 0, 4.0 / 6.0},  //10-8
-// 		{10, 6, false, 0, 0, 5.0 / 6.0},  //10-6
-// 		{10, 4, false, 0, 0, 5.0 / 6.0},  //10-4
-// 		{10, 1, false, 0, 0, 5.0 / 6.0},  //10-1
-// 		{8, 10, false, 0, 0, 3.0 / 6.0},  //8-10
-// 		{6, 10, false, 0, 0, 2.0 / 6.0},  //6-10
-// 		{4, 10, false, 0, 0, 2.0 / 6.0},  //4-10
-// 		{1, 10, false, 0, 0, 1.0 / 6.0},  //1-10
-
-// 		{10, 10, true, 0, 0, 3.0 / 6.0}, //10-10 with parry
-// 		{10, 8, true, 0, 0, 3.0 / 6.0},  //10-8 with parry
-// 		{10, 6, true, 0, 0, 3.0 / 6.0},  //10-6 with parry
-// 		{3, 6, true, 0, 0, 2.0 / 6.0},   //3-6 with parry adding +1ds
-// 		{6, 10, true, 0, 0, 2.0 / 6.0},  //6-10 with parry
-// 		{4, 10, true, 0, 0, 2.0 / 6.0},  //4-10 with parry
-// 		{1, 10, true, 0, 0, 1.0 / 6.0},  //1-10 with parry
-
-// 		{10, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
-// 		// {10, 6, false, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls for some reason there is a precision issue with this test which causes it to fail even though the values are the same to 6 decimal places.
-// 		{10, 8, false, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-8 &rerolls
-// 		{8, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //8-10 &rerolls
-// 		{6, 10, false, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //6-10 &rerolls
-// 		{1, 10, false, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
-// 		{10, 6, true, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)},  //10-6 with parry &rerolls
-
-// 		{10, 10, false, 0, 1, 4.0 / 6.0}, //10-10 +1hit
-// 		{10, 6, false, 0, 1, 5.0 / 6.0},  //10-6 +1hit
-// 		{10, 8, false, 0, 1, 5.0 / 6.0},  //10-8 +1hit
-// 		{8, 10, false, 0, 1, 4.0 / 6.0},  //8-10 +1hit
-// 		{6, 10, false, 0, 1, 3.0 / 6.0},  //6-10 +1hit
-// 		{1, 10, false, 0, 1, 2.0 / 6.0},  //1-10 +1hit
-// 		{10, 6, true, 0, 1, 4.0 / 6.0},   //10-6 with parry +1hit
-
-// 		{10, 10, false, 0, -1, 2.0 / 6.0}, //10-10 -1hit
-// 		{10, 6, false, 0, -1, 4.0 / 6.0},  //10-6 -1hit
-// 		{10, 8, false, 0, -1, 3.0 / 6.0},  //10-8 -1hit
-// 		{8, 10, false, 0, -1, 2.0 / 6.0},  //8-10 -1hit
-// 		{6, 10, false, 0, -1, 1.0 / 6.0},  //6-10 -1hit
-// 		{1, 10, false, 0, -1, 1.0 / 6.0},  //1-10 -1hit
-// 		{10, 6, true, 0, -1, 2.0 / 6.0}}   //10-6 with parry -1hit
-
-// 	for _, tt := range Tests {
-// 		actual := hitChance(tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier)
-// 		if actual != tt.expected {
-// 			t.Errorf("hitChance(%d, %d, %t, %d, %d): expected %f, actual %f", tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier, tt.expected, actual)
-// 		}
-// 	}
-// }
-
-// func TestWoundChance(t *testing.T) {
-// 	var Tests = []struct {
-// 		//inputs
-// 		FSTR      int
-// 		ERES      int
-// 		rerollINC int
-// 		modifier  int
-
-// 		expected float64 // expected result
-// 	}{
-// 		{0, 0, 0, 0, 3.0 / 6.0},   //blank
-// 		{10, 10, 0, 0, 3.0 / 6.0}, //10-10
-// 		{10, 9, 0, 0, 4.0 / 6.0},  //10-9
-// 		{10, 6, 0, 0, 5.0 / 6.0},  //10-6
-// 		{10, 4, 0, 0, 5.0 / 6.0},  //10-4
-// 		{10, 1, 0, 0, 5.0 / 6.0},  //10-1
-// 		{9, 10, 0, 0, 2.0 / 6.0},  //9-10
-// 		{6, 10, 0, 0, 1.0 / 6.0},  //6-10
-// 		{4, 10, 0, 0, 1.0 / 6.0},  //4-10
-// 		{1, 10, 0, 0, 1.0 / 6.0},  //1-10
-
-// 		{10, 10, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
-// 		// {10, 6, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls. This also fails for some precision reason
-// 		{10, 9, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-9 &rerolls
-// 		{9, 10, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //9-10 &rerolls
-// 		{6, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //6-10 &rerolls
-// 		{1, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
-
-// 		{10, 10, 0, 1, 4.0 / 6.0}, //10-10 +1wound
-// 		{10, 6, 0, 1, 5.0 / 6.0},  //10-6 +1wound
-// 		{10, 9, 0, 1, 5.0 / 6.0},  //10-9 +1wound
-// 		{9, 10, 0, 1, 3.0 / 6.0},  //9-10 +1wound
-// 		{6, 10, 0, 1, 2.0 / 6.0},  //6-10 +1wound
-// 		{1, 10, 0, 1, 2.0 / 6.0},  //1-10 +1wound
-
-// 		{10, 10, 0, -1, 2.0 / 6.0}, //10-10 -1wound
-// 		{10, 6, 0, -1, 4.0 / 6.0},  //10-6 -1wound
-// 		{10, 9, 0, -1, 3.0 / 6.0},  //10-9 -1wound
-// 		{9, 10, 0, -1, 1.0 / 6.0},  //9-10 -1wound
-// 		{6, 10, 0, -1, 1.0 / 6.0},  //6-10 -1wound
-// 		{1, 10, 0, -1, 1.0 / 6.0}}  //1-10 -1wound
-
-// 	for _, tt := range Tests {
-// 		actual := woundChance(tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier)
-// 		if actual != tt.expected {
-// 			t.Errorf("woundChance(%d, %d, %d, %d): expected %f, actual %f", tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier, tt.expected, actual)
-// 		}
-// 	}
-// }
-
-// func TestArmourFailChance(t *testing.T) {
-// 	var Tests = []struct {
-// 		//inputs
-// 		FAP      int
-// 		EARM     int
-// 		expected float64 // expected result
-// 	}{
-// 		{0, 1, 5.0 / 6.0}, //blank
-// 		{0, 2, 4.0 / 6.0}, //blank
-// 		{0, 3, 3.0 / 6.0}, //blank
-// 		{0, 4, 2.0 / 6.0}, //blank
-// 		{0, 5, 1.0 / 6.0}, //blank
-// 		{0, 6, 1.0 / 6.0}, //blank
-// 		{0, 7, 1.0 / 6.0}, //blank
-
-// 		{3, 1, 6.0 / 6.0}, //blank
-// 		{3, 2, 6.0 / 6.0}, //blank
-// 		{3, 3, 6.0 / 6.0}, //blank
-// 		{3, 4, 5.0 / 6.0}, //blank
-// 		{3, 5, 4.0 / 6.0}, //blank
-// 		{3, 6, 3.0 / 6.0}, //blank
-// 		{3, 7, 2.0 / 6.0}, //blank
-// 		{3, 8, 1.0 / 6.0}} //1-10 -1wound
-
-// 	for _, tt := range Tests {
-// 		actual := armourFailChance(tt.FAP, tt.EARM)
-// 		if actual != tt.expected {
-// 			t.Errorf("armourFailChance(%d, %d): expected %f, actual %f", tt.FAP, tt.EARM, tt.expected, actual)
-// 		}
-// 	}
-// }
 
 func TestFightOrder(t *testing.T) {
 	var Tests = []struct {
