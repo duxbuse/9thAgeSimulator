@@ -60,11 +60,7 @@ func fight(data Data) Outcome {
 	firstHitReroll := 0
 	firstWoundReroll := 0
 	firstFIAR := 0
-	firstHatred := data.SpecialtiesStatsOn[string(order)+"Hatred"]
-	firstDistracting := data.SpecialtiesStatsOn[string(order)+"Distracting"]
-	firstLightningReflexes := data.SpecialtiesStatsOn[string(order)+"Lightning Reflexes"]
-	firstKillerInstinct := data.SpecialtiesStatsOn[string(order)+"Killer Instinct"]
-	firstShieldWall := data.SpecialtiesStatsOn[string(order)+"Shield Wall"]
+	firstLethalStrike := false
 
 	//Make changes for firsts weapons
 	switch data.SecondaryStats[string(order)+"WeaponSelect"].Value {
@@ -79,7 +75,6 @@ func fight(data Data) Outcome {
 	case 4: //Greatweapon
 		firstSTR += 2
 		firstAP += 2
-		firstLightningReflexes = false
 		//AGI allready handled
 	case 5: //Paired Weapons
 		firstOFF++
@@ -91,23 +86,6 @@ func fight(data Data) Outcome {
 		firstSTR += 2
 		firstAP += 2
 	case 8: //none
-	}
-	// Make changes for specialties
-	if firstShieldWall && firstSS < 2 {
-		//handle charging so its not always a 5++
-		firstSS = 2
-	}
-	if firstLightningReflexes {
-		firstHitMod++
-	}
-	if firstDistracting {
-		secondHitMod--
-	}
-	if firstHatred {
-		firstHitReroll = 6 //reroll upto all values
-	}
-	if firstKillerInstinct {
-		firstWoundReroll = 1 //only reroll 1's
 	}
 
 	secondHeightSelection := data.SecondaryStats[string(notOrder)+"HeightSelect"].Value
@@ -131,15 +109,85 @@ func fight(data Data) Outcome {
 	secondHitReroll := 0
 	secondWoundReroll := 0
 	secondFIAR := 0
-	secondHatred := data.SpecialtiesStatsOn[string(notOrder)+"Hatred"]
-	secondDistracting := data.SpecialtiesStatsOn[string(notOrder)+"Distracting"]
-	secondLightningReflexes := data.SpecialtiesStatsOn[string(notOrder)+"Lightning Reflexes"]
-	secondKillerInstinct := data.SpecialtiesStatsOn[string(notOrder)+"Killer Instinct"]
-	secondShieldWall := data.SpecialtiesStatsOn[string(notOrder)+"Shield Wall"]
+	secondLethalStrike := false
+
+	for k, v := range data.SpecialtiesStatsOn { //set each specialty
+		if v {
+			switch k[1:] {
+			case "Hatred":
+				if []rune(k)[0] == order {
+					firstHitReroll = 6 //reroll upto all values
+				} else if []rune(k)[0] == notOrder {
+					secondHitReroll = 6 //reroll upto all values
+				}
+			case "Distracting":
+				if []rune(k)[0] == order {
+					secondHitMod--
+				} else if []rune(k)[0] == notOrder {
+					firstHitMod--
+				}
+			case "Lightning Reflexes":
+				if []rune(k)[0] == order {
+					if data.SecondaryStats[string(order)+"WeaponSelect"].Value != 4 { //not using a great weapon, agi allready handled
+						firstHitMod++
+					}
+
+				} else if []rune(k)[0] == notOrder {
+					if data.SecondaryStats[string(notOrder)+"WeaponSelect"].Value != 4 { //not using a great weapon, agi allready handled
+						secondHitMod++
+					}
+
+				}
+			case "Killer Instinct":
+				if []rune(k)[0] == order {
+					firstWoundReroll = 1 //only reroll 1's
+				} else if []rune(k)[0] == notOrder {
+					secondWoundReroll = 1 //only reroll 1's
+				}
+			case "ShieldWall":
+				if []rune(k)[0] == order {
+					if firstSS < 2 {
+						//handle charging so its not always a 5++
+						firstSS = 2
+					}
+				} else if []rune(k)[0] == notOrder {
+					if secondSS < 2 {
+						//handle charging so its not always a 5++
+						secondSS = 2
+					}
+				}
+			case "Lethal Strike":
+				if []rune(k)[0] == order {
+					firstLethalStrike = true
+				} else if []rune(k)[0] == notOrder {
+					secondLethalStrike = true
+				}
+			case "Born to Fight": //TODO: need to change this when fighting over more than 1 round
+				if []rune(k)[0] == order {
+					firstSTR++
+					firstAP++
+
+				} else if []rune(k)[0] == notOrder {
+					secondSTR++
+					secondAP++
+				}
+			case "Black Standard of Zagvozd":
+				if []rune(k)[0] == order {
+					firstHitMod++
+				} else if []rune(k)[0] == notOrder {
+					secondHitMod++
+				}
+			}
+		}
+	}
+
 	//Make changes for seconds weapons
 	switch data.SecondaryStats[string(notOrder)+"WeaponSelect"].Value {
 	case 1: //Sword and Board
-		secondParry = true
+		if data.SecondaryStats[string(order)+"WeaponSelect"].Value != 5 { //cant parry against paired weapons
+			secondParry = true
+		}
+
 	case 2: //Spear
 		secondFIAR++
 		secondAP++
@@ -150,11 +198,11 @@ func fight(data Data) Outcome {
 	case 4: //Greatweapon
 		secondSTR += 2
 		secondAP += 2
-		secondLightningReflexes = false
 		//AGI allready handled
 	case 5: //Paired Weapons
 		secondOFF++
 		secondATT++
+		firstParry = false
 	case 6: //Light Lance
 		secondSTR++
 		secondAP++
@@ -163,23 +211,7 @@ func fight(data Data) Outcome {
 		secondAP += 2
 	case 8: //none
 	}
-	// Make changes for specailties
-	if secondShieldWall && secondSS < 2 {
-		//handle charging so its not always a 5++
-		secondSS = 2
-	}
-	if secondLightningReflexes {
-		secondHitMod++
-	}
-	if secondDistracting {
-		firstHitMod--
-	}
-	if secondHatred {
-		secondHitReroll = 6 //reroll upto all values
-	}
-	if secondKillerInstinct {
-		secondWoundReroll = 1 //only reroll 1's
-	}
+
 	/////////////////////////////////////////////////////////////////
 	// Calculate the results now all the stats are avaliable
 
@@ -188,37 +220,42 @@ func fight(data Data) Outcome {
 
 	firstAttacks, firstBonusHits := numOfAttacks(firstCombatants, firstATT, firstQAN, firstFOR, firstHeightSelection, secondHeightSelection, firstFIAR)
 
-	firstHitChance := hitChance(firstOFF, secondDEF, secondParry, firstHitReroll, firstHitMod)
+	firstHits, firstHitSixes := hits(firstAttacks, firstOFF, secondDEF, secondParry, firstHitReroll, firstHitMod)
+	firstHits += firstBonusHits
+	firstWounds, firstWoundSixes := wounds((firstHits + firstHitSixes), firstSTR, secondRES, 0, firstWoundReroll) //add some logic for poison and battle focus
+	firstArmourFails := 0
+	if firstLethalStrike {
+		firstArmourFails = armourFails(firstWounds, firstAP, secondARM) + firstWoundSixes
+	} else {
+		firstArmourFails = armourFails((firstWounds + firstWoundSixes), firstAP, secondARM)
+	}
 
-	firstWoundChance := woundChance(firstSTR, secondRES, 0, firstWoundReroll) //TODO: bring in modifiers properly
-	firstArmourFailChance := armourFailChance(firstAP, secondARM)
-
-	firstSpecialFailChance := armourFailChance(0, secondSS) //ap is always 0 for special saves
-
-	firstCasualties := (firstAttacks*firstHitChance + firstBonusHits) * firstWoundChance * firstArmourFailChance * firstSpecialFailChance
+	firstCasualties := armourFails(firstArmourFails, 0, secondSS)
 
 	// Take off the casualties now if not simultaneous combat
 	if !(beforeOrder == 'S') {
-		secondQAN = secondQAN - int(math.Floor(firstCasualties/float64(secondHP)))
+		secondQAN = secondQAN - int(math.Floor(float64(firstCasualties)/float64(secondHP)))
 
 	}
 
 	secondAttacks, secondBonusHits := numOfAttacks(secondCombatants, secondATT, secondQAN, secondFOR, secondHeightSelection, firstHeightSelection, secondFIAR)
 
-	if secondLightningReflexes {
-		secondHitMod++
+	secondHits, secondHitSixes := hits(secondAttacks, secondOFF, firstDEF, firstParry, secondHitReroll, secondHitMod)
+	secondHits += secondBonusHits
+	secondWounds, secondWoundSixes := wounds((secondHits + secondHitSixes), secondSTR, firstRES, 0, secondWoundReroll) //add some logic for poison and battle focus
+	secondArmourFails := 0
+	if secondLethalStrike {
+		secondArmourFails = armourFails(secondWounds, secondAP, firstARM) + secondWoundSixes
+	} else {
+		secondArmourFails = armourFails((secondWounds + secondWoundSixes), secondAP, firstARM)
 	}
-	secondHitChance := hitChance(secondOFF, firstDEF, firstParry, secondHitReroll, secondHitMod)
-	secondWoundChance := woundChance(secondSTR, firstRES, secondWoundReroll, 0) //TODO: bring in modifiers and rerolls properly
-	secondArmourFailChance := armourFailChance(secondAP, firstARM)
-	secondSpecialFailChance := armourFailChance(0, firstSS)
 
-	secondCasualties := (secondAttacks*secondHitChance + secondBonusHits) * secondWoundChance * secondArmourFailChance * secondSpecialFailChance
+	secondCasualties := armourFails(secondArmourFails, 0, firstSS)
 
 	// Take off the casualties
-	firstQAN = firstQAN - int(math.Floor(secondCasualties/float64(firstHP)))
+	firstQAN = firstQAN - int(math.Floor(float64(secondCasualties)/float64(firstHP)))
 	if beforeOrder == 'S' { //and the inital casualties for simultaneous combat.
-		secondQAN = secondQAN - int(math.Floor(firstCasualties/float64(secondHP)))
+		secondQAN = secondQAN - int(math.Floor(float64(firstCasualties)/float64(secondHP)))
 	}
 
 	firstCombatRes := CombatRes(firstCasualties, firstQAN, firstFOR, firstHeightSelection, 0) //TODO: bonuses need work like having a banner or charging.
@@ -256,80 +293,191 @@ func fight(data Data) Outcome {
 
 }
 
-func CombatRes(casualties float64, quantity int, formation int, unitHeight int, bonuses int) int {
+func CombatRes(casualties int, quantity int, formation int, unitHeight int, bonuses int) int {
 
 	rankbonus := float64(ranks(quantity, formation, unitHeight) - 1) //first rank doesnt give a bonus
 	if rankbonus < 0.0 {
 		rankbonus = 0.0 //ensure you cant go negative
 	}
-	return int(math.Floor(math.Min(rankbonus, 3) + casualties + float64(bonuses)))
+	return int(math.Floor(math.Min(rankbonus, 3) + float64(casualties) + float64(bonuses)))
 }
-func hitChance(FOFF int, EDEF int, parry bool, rerollINC int, modifier int) float64 {
+func hits(FATT int, FOFF int, EDEF int, parry bool, rerollINC int, modifier int) (int, int) {
 	// rerollINC represents the values up to reroll out of 6 to reroll. EG rerollINC =  1 only rerolls values of 1, rerollINC = 6 rerolls all values.
 	//modifier can be +1 or -1 to represent hitting easier.
 	//TODO: potentialy use parry as an int so that things like can never be hit on better than a x+ can be quasi parry. Since parry is essentially cant be hit on better than a 4+
+	//TODO: add code for when a 6 is rolled and either battle focus or poison occurs
+	hits := 0
+	sixes := 0
 	diff := FOFF - EDEF
-	if parry && diff < 0 {
-		diff-- //the enemy gets an extra point of ds with shield if normally higher
-	}
-	hit := 0.0
-	if diff >= 4 {
-		hit = 5.0
-	} else if diff > 0 {
-		hit = 4.0
-	} else if diff >= -3 {
-		hit = 3.0
-	} else if diff >= -7 {
-		hit = 2.0
-	} else {
-		hit = 1.0
-	}
-	if parry && hit > 3.0 {
-		hit = 3.0
-	}
-	hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
+	for i := 0; i < FATT; i++ {
+		if parry && diff < 0 {
+			diff-- //the enemy gets an extra point of ds with shield if normally higher
+		}
+		hit := 0.0
+		if diff >= 4 {
+			hit = 5.0
+		} else if diff > 0 {
+			hit = 4.0
+		} else if diff >= -3 {
+			hit = 3.0
+		} else if diff >= -7 {
+			hit = 2.0
+		} else {
+			hit = 1.0
+		}
+		if parry && hit > 3.0 {
+			hit = 3.0
+		}
+		hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
 
-	chance := hit / 6.0
-	failedchance := (6.0 - hit) / 6.0
-	rerollpercent := float64(rerollINC) / 6.0
-	percentToReroll := math.Min(failedchance, rerollpercent)
+		dice := RollDice()
+		if dice >= int(7-hit) {
+			if dice == 6 {
+				sixes++
+			} else {
+				hits++
+			}
+		} else if dice <= rerollINC {
+			dice = RollDice()
+			if dice >= int(7-hit) {
+				if dice == 6 {
+					sixes++
+				} else {
+					hits++
+				}
 
-	total := chance + percentToReroll*chance
-	return total
+			}
+		}
+	}
+	return hits, sixes
 }
-func woundChance(FSTR int, ERES int, rerollINC int, modifier int) float64 {
+
+// func hitChance(FOFF int, EDEF int, parry bool, rerollINC int, modifier int) float64 {
+// 	// rerollINC represents the values up to reroll out of 6 to reroll. EG rerollINC =  1 only rerolls values of 1, rerollINC = 6 rerolls all values.
+// 	//modifier can be +1 or -1 to represent hitting easier.
+// 	//TODO: potentialy use parry as an int so that things like can never be hit on better than a x+ can be quasi parry. Since parry is essentially cant be hit on better than a 4+
+// 	diff := FOFF - EDEF
+// 	if parry && diff < 0 {
+// 		diff-- //the enemy gets an extra point of ds with shield if normally higher
+// 	}
+// 	hit := 0.0
+// 	if diff >= 4 {
+// 		hit = 5.0
+// 	} else if diff > 0 {
+// 		hit = 4.0
+// 	} else if diff >= -3 {
+// 		hit = 3.0
+// 	} else if diff >= -7 {
+// 		hit = 2.0
+// 	} else {
+// 		hit = 1.0
+// 	}
+// 	if parry && hit > 3.0 {
+// 		hit = 3.0
+// 	}
+// 	hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
+
+// 	chance := hit / 6.0
+// 	failedchance := (6.0 - hit) / 6.0
+// 	rerollpercent := float64(rerollINC) / 6.0
+// 	percentToReroll := math.Min(failedchance, rerollpercent)
+
+// 	total := chance + percentToReroll*chance
+// 	return total
+// }
+func wounds(hits int, FSTR int, ERES int, rerollINC int, modifier int) (int, int) {
+	wounds := 0
+	sixes := 0
 	diff := FSTR - ERES
 	wound := 0.0
-	if diff >= 2 {
-		wound = 5.0
-	} else if diff >= 1 {
-		wound = 4.0
-	} else if diff == 0 {
-		wound = 3.0
-	} else if diff >= -1 {
-		wound = 2.0
-	} else {
-		wound = 1.0
-	}
-	wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
+	for i := 0; i < hits; i++ {
+		if diff >= 2 {
+			wound = 5.0
+		} else if diff >= 1 {
+			wound = 4.0
+		} else if diff == 0 {
+			wound = 3.0
+		} else if diff >= -1 {
+			wound = 2.0
+		} else {
+			wound = 1.0
+		}
+		wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
 
-	chance := wound / 6.0
-	failedchance := (6.0 - wound) / 6.0
-	rerollpercent := float64(rerollINC) / 6.0
-	percentToReroll := math.Min(failedchance, rerollpercent)
+		dice := RollDice()
+		if dice >= int(7-wound) {
+			if dice == 6 {
+				sixes++
+			} else {
+				wounds++
+			}
 
-	total := chance + percentToReroll*chance
-	return total
-}
-func armourFailChance(FAP int, EARM int) float64 { //TODO: rerolls both failed and successfull
-	chance := EARM - FAP
-	if chance > 5 {
-		chance = 5
-	} else if chance < 0 {
-		chance = 0
+		} else if dice <= rerollINC {
+			dice = RollDice()
+			if dice >= int(7-wound) {
+				if dice == 6 {
+					sixes++
+				} else {
+					wounds++
+				}
+			}
+		}
 	}
-	return (6 - float64(chance)) / 6
+	return wounds, sixes
 }
+
+// func woundChance(FSTR int, ERES int, rerollINC int, modifier int) float64 {
+// 	diff := FSTR - ERES
+// 	wound := 0.0
+// 	if diff >= 2 {
+// 		wound = 5.0
+// 	} else if diff >= 1 {
+// 		wound = 4.0
+// 	} else if diff == 0 {
+// 		wound = 3.0
+// 	} else if diff >= -1 {
+// 		wound = 2.0
+// 	} else {
+// 		wound = 1.0
+// 	}
+// 	wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
+
+// 	chance := wound / 6.0
+// 	failedchance := (6.0 - wound) / 6.0
+// 	rerollpercent := float64(rerollINC) / 6.0
+// 	percentToReroll := math.Min(failedchance, rerollpercent)
+
+// 	total := chance + percentToReroll*chance
+// 	return total
+// }
+func armourFails(wounds int, FAP int, EARM int) int { //TODO: rerolls both failed and successfull
+	armour := EARM - FAP
+	fails := 0
+	for i := 0; i < wounds; i++ {
+
+		if armour > 5 {
+			armour = 5
+		} else if armour < 0 {
+			armour = 0
+		}
+		dice := RollDice()
+		if dice < int(7-armour) {
+			//great its a hit
+			fails++
+		}
+	}
+	return fails
+}
+
+// func armourFailChance(FAP int, EARM int) float64 { //TODO: rerolls both failed and successfull
+// 	chance := EARM - FAP
+// 	if chance > 5 {
+// 		chance = 5
+// 	} else if chance < 0 {
+// 		chance = 0
+// 	}
+// 	return (6 - float64(chance)) / 6
+// }
 func fightOrder(FAGI int, EAGI int) rune {
 	if EAGI > FAGI {
 		return 'E' //Enemy first
@@ -393,8 +541,9 @@ func ranks(quantity int, formation int, height int) int {
 
 /*
 numOfAttacks returns the number of attacks the unit will get to make, as well as how many bonus hits like stomps as the second return value.
+TODO: add poison as a bonus wound.
 */
-func numOfAttacks(combatants int, attacks int, quantity int, formation int, firstHeight int, secondHeight int, fightExtraRank int) (float64, float64) {
+func numOfAttacks(combatants int, attacks int, quantity int, formation int, firstHeight int, secondHeight int, fightExtraRank int) (int, int) {
 	//height 1 = standard
 	//height 2 = large
 	//height 3 = gigantic
@@ -417,7 +566,7 @@ func numOfAttacks(combatants int, attacks int, quantity int, formation int, firs
 	} else if firstHeight == 3 {
 		maxSupportingAttacks = 5
 		if secondHeight == 1 { //can only stomp standard
-			bonusHits = float64(combatants) * 3.5 //should be a d6 but meh.
+			bonusHits = float64(combatants) * float64(RollDice())
 		}
 	}
 	//TODO: bonus hits +=(d6+1) for impact hits. Need to know if chariots etc. Reliant on if charging
@@ -425,7 +574,7 @@ func numOfAttacks(combatants int, attacks int, quantity int, formation int, firs
 	// min of max number of supporting attacks for guys engaged or every remaining model supporting
 	supportingAttacks := math.Min(float64(combatants*(fightingRanks-1)*maxSupportingAttacks), float64((quantity-formation)*maxSupportingAttacks))
 
-	return frontRowAttacks + supportingAttacks, bonusHits
+	return int(frontRowAttacks + supportingAttacks), int(bonusHits)
 }
 
 /*

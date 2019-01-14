@@ -2,6 +2,7 @@ package Utilities
 
 import (
 	"html/template"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -42,8 +43,9 @@ type Outcome struct {
 }
 
 type Results struct {
-	UnitData     Data
-	FightResults Outcome
+	UnitData        Data
+	FightResults    Outcome
+	AVGFightResults Outcome
 }
 
 /*
@@ -107,12 +109,12 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 		1: "DE",
 		2: "DH",
 		3: "VC",
-		4: "OK"}
+		4: "OK",
+		5: "OnG"}
 
-	specialtiesStatsNames := map[string]string{"Hatred": "any", "Distracting": "any", "Lightning Reflexes": "any", "Killer Instinct": "DE", "Shield Wall": "DH"}
+	specialtiesStatsNames := map[string]string{"Hatred": "any", "Distracting": "any", "Lightning Reflexes": "any", "Killer Instinct": "DE", "Shield Wall": "DH", "Lethal Strike": "any", "Born to Fight": "OnG", "Black Standard of Zagvozd": "VC"}
 
 	specialtiesStatsOn := map[string]bool{}
-	// TODO: Make the specialties impact the reuslts
 	for k := range specialtiesStatsNames {
 		specialtiesStatsOn["F"+k] = len(r.FormValue("F"+k)) > 0
 		specialtiesStatsOn["E"+k] = len(r.FormValue("E"+k)) > 0
@@ -120,9 +122,15 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 	// Save all unit data as one object
 	data := Data{RawStats: urawstats, SecondaryStats: usecondarystats, Weapon: uweapon, Height: uheight, Type: utype, Width: ubase, Races: races, SpecialtiesStats: specialtiesStatsNames, SpecialtiesStatsOn: specialtiesStatsOn}
 
-	outcome := fight(data)
+	outcomes := make([]Outcome, 100) //simulate 100 fights
+	for i := 0; i < 100; i++ {
+		outcomes[i] = fight(data)
+	}
 
-	payload := Results{UnitData: data, FightResults: outcome}
+	// calculate Averages
+	AVGoutcome := calculateAVGoutcome(outcomes)
+
+	payload := Results{UnitData: data, FightResults: outcomes[0], AVGFightResults: AVGoutcome}
 
 	// Begin templating
 	t, err := template.ParseFiles("./../public/views/" + tmpl + ".html")
@@ -134,4 +142,51 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func calculateAVGoutcome(outcomes []Outcome) Outcome {
+	FriendWinnerTally := 0
+	EnemyWinnerTally := 0
+
+	FriendWinnerAmmount := 0
+	EnemyWinnerAmmount := 0
+
+	FriendBreakChance := 0.0
+	EnemyBreakChance := 0.0
+
+	FriendNUM := 0
+	EnemyNUM := 0
+
+	for _, e := range outcomes {
+		if e.WINNER {
+			FriendWinnerTally++
+			FriendWinnerAmmount += e.AMMOUNT
+			strToFloat, _ := strconv.ParseFloat(e.BreakChance, 64)
+			FriendBreakChance += strToFloat
+		} else {
+			EnemyWinnerTally++
+			EnemyWinnerAmmount += e.AMMOUNT
+			strToFloat, _ := strconv.ParseFloat(e.BreakChance, 64)
+			EnemyBreakChance += strToFloat
+		}
+		FriendNUM += e.FNUM
+		EnemyNUM += e.ENUM
+
+	}
+	AVGFriendNUM := int(math.Round(float64(FriendNUM) / float64(len(outcomes))))
+	AVGEnemyNUM := int(math.Round(float64(EnemyNUM) / float64(len(outcomes))))
+
+	if FriendWinnerTally >= EnemyWinnerTally { //friend wins or draws
+		AVGWinner := true
+		AVGWinAmmount := int(math.Round(float64(FriendWinnerAmmount) / float64(FriendWinnerTally)))
+		AVGBreakChance := strconv.FormatInt(int64(math.Round(FriendBreakChance/float64(FriendWinnerTally))), 10)
+
+		return Outcome{AVGWinner, AVGWinAmmount, AVGBreakChance, AVGFriendNUM, AVGEnemyNUM}
+	}
+	//Enemy Wins
+	AVGWinner := false
+	AVGWinAmmount := int(math.Round(float64(EnemyWinnerAmmount) / float64(EnemyWinnerTally)))
+	AVGBreakChance := strconv.FormatInt(int64(math.Round(EnemyBreakChance/float64(EnemyWinnerTally))), 10)
+	return Outcome{AVGWinner, AVGWinAmmount, AVGBreakChance, AVGFriendNUM, AVGEnemyNUM}
+
 }

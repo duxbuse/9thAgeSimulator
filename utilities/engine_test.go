@@ -1,5 +1,7 @@
 package Utilities
 
+// TODO: need to re write the tests since no longer using chance but actual dice.
+
 import (
 	"math"
 	"strconv"
@@ -131,7 +133,7 @@ func TestFight(t *testing.T) {
 func TestCombatRes(t *testing.T) {
 	var Tests = []struct {
 		//inputs
-		casualties float64
+		casualties int
 		quantity   int
 		formation  int
 		unitHeight int
@@ -139,162 +141,162 @@ func TestCombatRes(t *testing.T) {
 
 		expected int // expected result
 	}{
-		{0.0, 0, 0, 0, 0, 0},   //blank
-		{12.0, 6, 3, 2, 1, 14}, //6 man large
-		{8.0, 1, 1, 3, 0, 8},   //1 man giant
-		{5.0, 20, 5, 1, 2, 10}} //20 man infantry
+		{0, 0, 0, 0, 0, 0},   //blank
+		{12, 6, 3, 2, 1, 14}, //6 man large
+		{8, 1, 1, 3, 0, 8},   //1 man giant
+		{5, 20, 5, 1, 2, 10}} //20 man infantry
 
 	for _, tt := range Tests {
 		actual := CombatRes(tt.casualties, tt.quantity, tt.formation, tt.unitHeight, tt.bonuses)
 		if actual != tt.expected {
-			t.Errorf("CombatRes(%f, %d, %d, %d, %d): expected %d, actual %d", tt.casualties, tt.quantity, tt.formation, tt.unitHeight, tt.bonuses, tt.expected, actual)
+			t.Errorf("CombatRes(%d, %d, %d, %d, %d): expected %d, actual %d", tt.casualties, tt.quantity, tt.formation, tt.unitHeight, tt.bonuses, tt.expected, actual)
 		}
 	}
 }
 
-func TestHitChance(t *testing.T) {
-	var Tests = []struct {
-		//inputs
-		FOFF      int
-		EDEF      int
-		parry     bool
-		rerollINC int
-		modifier  int
+// func TestHitChance(t *testing.T) {
+// 	var Tests = []struct {
+// 		//inputs
+// 		FOFF      int
+// 		EDEF      int
+// 		parry     bool
+// 		rerollINC int
+// 		modifier  int
 
-		expected float64 // expected result
-	}{
-		{0, 0, false, 0, 0, 3.0 / 6.0},   //blank
-		{10, 10, false, 0, 0, 3.0 / 6.0}, //10-10
-		{10, 8, false, 0, 0, 4.0 / 6.0},  //10-8
-		{10, 6, false, 0, 0, 5.0 / 6.0},  //10-6
-		{10, 4, false, 0, 0, 5.0 / 6.0},  //10-4
-		{10, 1, false, 0, 0, 5.0 / 6.0},  //10-1
-		{8, 10, false, 0, 0, 3.0 / 6.0},  //8-10
-		{6, 10, false, 0, 0, 2.0 / 6.0},  //6-10
-		{4, 10, false, 0, 0, 2.0 / 6.0},  //4-10
-		{1, 10, false, 0, 0, 1.0 / 6.0},  //1-10
+// 		expected float64 // expected result
+// 	}{
+// 		{0, 0, false, 0, 0, 3.0 / 6.0},   //blank
+// 		{10, 10, false, 0, 0, 3.0 / 6.0}, //10-10
+// 		{10, 8, false, 0, 0, 4.0 / 6.0},  //10-8
+// 		{10, 6, false, 0, 0, 5.0 / 6.0},  //10-6
+// 		{10, 4, false, 0, 0, 5.0 / 6.0},  //10-4
+// 		{10, 1, false, 0, 0, 5.0 / 6.0},  //10-1
+// 		{8, 10, false, 0, 0, 3.0 / 6.0},  //8-10
+// 		{6, 10, false, 0, 0, 2.0 / 6.0},  //6-10
+// 		{4, 10, false, 0, 0, 2.0 / 6.0},  //4-10
+// 		{1, 10, false, 0, 0, 1.0 / 6.0},  //1-10
 
-		{10, 10, true, 0, 0, 3.0 / 6.0}, //10-10 with parry
-		{10, 8, true, 0, 0, 3.0 / 6.0},  //10-8 with parry
-		{10, 6, true, 0, 0, 3.0 / 6.0},  //10-6 with parry
-		{3, 6, true, 0, 0, 2.0 / 6.0},   //3-6 with parry adding +1ds
-		{6, 10, true, 0, 0, 2.0 / 6.0},  //6-10 with parry
-		{4, 10, true, 0, 0, 2.0 / 6.0},  //4-10 with parry
-		{1, 10, true, 0, 0, 1.0 / 6.0},  //1-10 with parry
+// 		{10, 10, true, 0, 0, 3.0 / 6.0}, //10-10 with parry
+// 		{10, 8, true, 0, 0, 3.0 / 6.0},  //10-8 with parry
+// 		{10, 6, true, 0, 0, 3.0 / 6.0},  //10-6 with parry
+// 		{3, 6, true, 0, 0, 2.0 / 6.0},   //3-6 with parry adding +1ds
+// 		{6, 10, true, 0, 0, 2.0 / 6.0},  //6-10 with parry
+// 		{4, 10, true, 0, 0, 2.0 / 6.0},  //4-10 with parry
+// 		{1, 10, true, 0, 0, 1.0 / 6.0},  //1-10 with parry
 
-		{10, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
-		// {10, 6, false, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls for some reason there is a precision issue with this test which causes it to fail even though the values are the same to 6 decimal places.
-		{10, 8, false, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-8 &rerolls
-		{8, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //8-10 &rerolls
-		{6, 10, false, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //6-10 &rerolls
-		{1, 10, false, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
-		{10, 6, true, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)},  //10-6 with parry &rerolls
+// 		{10, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
+// 		// {10, 6, false, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls for some reason there is a precision issue with this test which causes it to fail even though the values are the same to 6 decimal places.
+// 		{10, 8, false, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-8 &rerolls
+// 		{8, 10, false, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //8-10 &rerolls
+// 		{6, 10, false, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //6-10 &rerolls
+// 		{1, 10, false, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
+// 		{10, 6, true, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)},  //10-6 with parry &rerolls
 
-		{10, 10, false, 0, 1, 4.0 / 6.0}, //10-10 +1hit
-		{10, 6, false, 0, 1, 5.0 / 6.0},  //10-6 +1hit
-		{10, 8, false, 0, 1, 5.0 / 6.0},  //10-8 +1hit
-		{8, 10, false, 0, 1, 4.0 / 6.0},  //8-10 +1hit
-		{6, 10, false, 0, 1, 3.0 / 6.0},  //6-10 +1hit
-		{1, 10, false, 0, 1, 2.0 / 6.0},  //1-10 +1hit
-		{10, 6, true, 0, 1, 4.0 / 6.0},   //10-6 with parry +1hit
+// 		{10, 10, false, 0, 1, 4.0 / 6.0}, //10-10 +1hit
+// 		{10, 6, false, 0, 1, 5.0 / 6.0},  //10-6 +1hit
+// 		{10, 8, false, 0, 1, 5.0 / 6.0},  //10-8 +1hit
+// 		{8, 10, false, 0, 1, 4.0 / 6.0},  //8-10 +1hit
+// 		{6, 10, false, 0, 1, 3.0 / 6.0},  //6-10 +1hit
+// 		{1, 10, false, 0, 1, 2.0 / 6.0},  //1-10 +1hit
+// 		{10, 6, true, 0, 1, 4.0 / 6.0},   //10-6 with parry +1hit
 
-		{10, 10, false, 0, -1, 2.0 / 6.0}, //10-10 -1hit
-		{10, 6, false, 0, -1, 4.0 / 6.0},  //10-6 -1hit
-		{10, 8, false, 0, -1, 3.0 / 6.0},  //10-8 -1hit
-		{8, 10, false, 0, -1, 2.0 / 6.0},  //8-10 -1hit
-		{6, 10, false, 0, -1, 1.0 / 6.0},  //6-10 -1hit
-		{1, 10, false, 0, -1, 1.0 / 6.0},  //1-10 -1hit
-		{10, 6, true, 0, -1, 2.0 / 6.0}}   //10-6 with parry -1hit
+// 		{10, 10, false, 0, -1, 2.0 / 6.0}, //10-10 -1hit
+// 		{10, 6, false, 0, -1, 4.0 / 6.0},  //10-6 -1hit
+// 		{10, 8, false, 0, -1, 3.0 / 6.0},  //10-8 -1hit
+// 		{8, 10, false, 0, -1, 2.0 / 6.0},  //8-10 -1hit
+// 		{6, 10, false, 0, -1, 1.0 / 6.0},  //6-10 -1hit
+// 		{1, 10, false, 0, -1, 1.0 / 6.0},  //1-10 -1hit
+// 		{10, 6, true, 0, -1, 2.0 / 6.0}}   //10-6 with parry -1hit
 
-	for _, tt := range Tests {
-		actual := hitChance(tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier)
-		if actual != tt.expected {
-			t.Errorf("hitChance(%d, %d, %t, %d, %d): expected %f, actual %f", tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier, tt.expected, actual)
-		}
-	}
-}
+// 	for _, tt := range Tests {
+// 		actual := hitChance(tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier)
+// 		if actual != tt.expected {
+// 			t.Errorf("hitChance(%d, %d, %t, %d, %d): expected %f, actual %f", tt.FOFF, tt.EDEF, tt.parry, tt.rerollINC, tt.modifier, tt.expected, actual)
+// 		}
+// 	}
+// }
 
-func TestWoundChance(t *testing.T) {
-	var Tests = []struct {
-		//inputs
-		FSTR      int
-		ERES      int
-		rerollINC int
-		modifier  int
+// func TestWoundChance(t *testing.T) {
+// 	var Tests = []struct {
+// 		//inputs
+// 		FSTR      int
+// 		ERES      int
+// 		rerollINC int
+// 		modifier  int
 
-		expected float64 // expected result
-	}{
-		{0, 0, 0, 0, 3.0 / 6.0},   //blank
-		{10, 10, 0, 0, 3.0 / 6.0}, //10-10
-		{10, 9, 0, 0, 4.0 / 6.0},  //10-9
-		{10, 6, 0, 0, 5.0 / 6.0},  //10-6
-		{10, 4, 0, 0, 5.0 / 6.0},  //10-4
-		{10, 1, 0, 0, 5.0 / 6.0},  //10-1
-		{9, 10, 0, 0, 2.0 / 6.0},  //9-10
-		{6, 10, 0, 0, 1.0 / 6.0},  //6-10
-		{4, 10, 0, 0, 1.0 / 6.0},  //4-10
-		{1, 10, 0, 0, 1.0 / 6.0},  //1-10
+// 		expected float64 // expected result
+// 	}{
+// 		{0, 0, 0, 0, 3.0 / 6.0},   //blank
+// 		{10, 10, 0, 0, 3.0 / 6.0}, //10-10
+// 		{10, 9, 0, 0, 4.0 / 6.0},  //10-9
+// 		{10, 6, 0, 0, 5.0 / 6.0},  //10-6
+// 		{10, 4, 0, 0, 5.0 / 6.0},  //10-4
+// 		{10, 1, 0, 0, 5.0 / 6.0},  //10-1
+// 		{9, 10, 0, 0, 2.0 / 6.0},  //9-10
+// 		{6, 10, 0, 0, 1.0 / 6.0},  //6-10
+// 		{4, 10, 0, 0, 1.0 / 6.0},  //4-10
+// 		{1, 10, 0, 0, 1.0 / 6.0},  //1-10
 
-		{10, 10, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
-		// {10, 6, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls. This also fails for some precision reason
-		{10, 9, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-9 &rerolls
-		{9, 10, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //9-10 &rerolls
-		{6, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //6-10 &rerolls
-		{1, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
+// 		{10, 10, 6, 0, (3.0 / 6.0) + (1.0-(3.0/6.0))*(3.0/6.0)}, //10-10 &rerolls
+// 		// {10, 6, 6, 0, (5.0 / 6.0) + (1.0-(5.0/6.0))*(5.0/6.0)},  //10-6 &rerolls. This also fails for some precision reason
+// 		{10, 9, 6, 0, (4.0 / 6.0) + (1.0-(4.0/6.0))*(4.0/6.0)}, //10-9 &rerolls
+// 		{9, 10, 6, 0, (2.0 / 6.0) + (1.0-(2.0/6.0))*(2.0/6.0)}, //9-10 &rerolls
+// 		{6, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //6-10 &rerolls
+// 		{1, 10, 6, 0, (1.0 / 6.0) + (1.0-(1.0/6.0))*(1.0/6.0)}, //1-10 &rerolls
 
-		{10, 10, 0, 1, 4.0 / 6.0}, //10-10 +1wound
-		{10, 6, 0, 1, 5.0 / 6.0},  //10-6 +1wound
-		{10, 9, 0, 1, 5.0 / 6.0},  //10-9 +1wound
-		{9, 10, 0, 1, 3.0 / 6.0},  //9-10 +1wound
-		{6, 10, 0, 1, 2.0 / 6.0},  //6-10 +1wound
-		{1, 10, 0, 1, 2.0 / 6.0},  //1-10 +1wound
+// 		{10, 10, 0, 1, 4.0 / 6.0}, //10-10 +1wound
+// 		{10, 6, 0, 1, 5.0 / 6.0},  //10-6 +1wound
+// 		{10, 9, 0, 1, 5.0 / 6.0},  //10-9 +1wound
+// 		{9, 10, 0, 1, 3.0 / 6.0},  //9-10 +1wound
+// 		{6, 10, 0, 1, 2.0 / 6.0},  //6-10 +1wound
+// 		{1, 10, 0, 1, 2.0 / 6.0},  //1-10 +1wound
 
-		{10, 10, 0, -1, 2.0 / 6.0}, //10-10 -1wound
-		{10, 6, 0, -1, 4.0 / 6.0},  //10-6 -1wound
-		{10, 9, 0, -1, 3.0 / 6.0},  //10-9 -1wound
-		{9, 10, 0, -1, 1.0 / 6.0},  //9-10 -1wound
-		{6, 10, 0, -1, 1.0 / 6.0},  //6-10 -1wound
-		{1, 10, 0, -1, 1.0 / 6.0}}  //1-10 -1wound
+// 		{10, 10, 0, -1, 2.0 / 6.0}, //10-10 -1wound
+// 		{10, 6, 0, -1, 4.0 / 6.0},  //10-6 -1wound
+// 		{10, 9, 0, -1, 3.0 / 6.0},  //10-9 -1wound
+// 		{9, 10, 0, -1, 1.0 / 6.0},  //9-10 -1wound
+// 		{6, 10, 0, -1, 1.0 / 6.0},  //6-10 -1wound
+// 		{1, 10, 0, -1, 1.0 / 6.0}}  //1-10 -1wound
 
-	for _, tt := range Tests {
-		actual := woundChance(tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier)
-		if actual != tt.expected {
-			t.Errorf("woundChance(%d, %d, %d, %d): expected %f, actual %f", tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier, tt.expected, actual)
-		}
-	}
-}
+// 	for _, tt := range Tests {
+// 		actual := woundChance(tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier)
+// 		if actual != tt.expected {
+// 			t.Errorf("woundChance(%d, %d, %d, %d): expected %f, actual %f", tt.FSTR, tt.ERES, tt.rerollINC, tt.modifier, tt.expected, actual)
+// 		}
+// 	}
+// }
 
-func TestArmourFailChance(t *testing.T) {
-	var Tests = []struct {
-		//inputs
-		FAP      int
-		EARM     int
-		expected float64 // expected result
-	}{
-		{0, 1, 5.0 / 6.0}, //blank
-		{0, 2, 4.0 / 6.0}, //blank
-		{0, 3, 3.0 / 6.0}, //blank
-		{0, 4, 2.0 / 6.0}, //blank
-		{0, 5, 1.0 / 6.0}, //blank
-		{0, 6, 1.0 / 6.0}, //blank
-		{0, 7, 1.0 / 6.0}, //blank
+// func TestArmourFailChance(t *testing.T) {
+// 	var Tests = []struct {
+// 		//inputs
+// 		FAP      int
+// 		EARM     int
+// 		expected float64 // expected result
+// 	}{
+// 		{0, 1, 5.0 / 6.0}, //blank
+// 		{0, 2, 4.0 / 6.0}, //blank
+// 		{0, 3, 3.0 / 6.0}, //blank
+// 		{0, 4, 2.0 / 6.0}, //blank
+// 		{0, 5, 1.0 / 6.0}, //blank
+// 		{0, 6, 1.0 / 6.0}, //blank
+// 		{0, 7, 1.0 / 6.0}, //blank
 
-		{3, 1, 6.0 / 6.0}, //blank
-		{3, 2, 6.0 / 6.0}, //blank
-		{3, 3, 6.0 / 6.0}, //blank
-		{3, 4, 5.0 / 6.0}, //blank
-		{3, 5, 4.0 / 6.0}, //blank
-		{3, 6, 3.0 / 6.0}, //blank
-		{3, 7, 2.0 / 6.0}, //blank
-		{3, 8, 1.0 / 6.0}} //1-10 -1wound
+// 		{3, 1, 6.0 / 6.0}, //blank
+// 		{3, 2, 6.0 / 6.0}, //blank
+// 		{3, 3, 6.0 / 6.0}, //blank
+// 		{3, 4, 5.0 / 6.0}, //blank
+// 		{3, 5, 4.0 / 6.0}, //blank
+// 		{3, 6, 3.0 / 6.0}, //blank
+// 		{3, 7, 2.0 / 6.0}, //blank
+// 		{3, 8, 1.0 / 6.0}} //1-10 -1wound
 
-	for _, tt := range Tests {
-		actual := armourFailChance(tt.FAP, tt.EARM)
-		if actual != tt.expected {
-			t.Errorf("armourFailChance(%d, %d): expected %f, actual %f", tt.FAP, tt.EARM, tt.expected, actual)
-		}
-	}
-}
+// 	for _, tt := range Tests {
+// 		actual := armourFailChance(tt.FAP, tt.EARM)
+// 		if actual != tt.expected {
+// 			t.Errorf("armourFailChance(%d, %d): expected %f, actual %f", tt.FAP, tt.EARM, tt.expected, actual)
+// 		}
+// 	}
+// }
 
 func TestFightOrder(t *testing.T) {
 	var Tests = []struct {
@@ -382,8 +384,8 @@ func TestNumOfAttacks(t *testing.T) {
 		secondHeight   int
 		fightExtraRank int
 
-		expecteda float64 // expected result
-		expectedb float64 // expected result
+		expecteda int // expected result
+		expectedb int // expected result
 	}{
 		{5, 1, 25, 5, 1, 1, 1, 15, 0}, //25 spear men
 		{8, 1, 32, 8, 1, 1, 1, 32, 0}, //32 spear men horde
@@ -392,13 +394,13 @@ func TestNumOfAttacks(t *testing.T) {
 		{3, 3, 6, 3, 2, 1, 0, 18, 3},  //6 ogres against 5 wide inf
 		{3, 4, 12, 4, 2, 1, 0, 21, 3}, //12 ogres 4 wide only 3 engaged with paired weapons against inf
 		{1, 6, 1, 1, 3, 2, 0, 6, 0},   //giant v ogres
-		{1, 6, 1, 1, 3, 1, 0, 6, 3.5}, //giant v inf
+		{1, 6, 1, 1, 3, 1, 0, 6, 3},   //giant v inf
 		{6, 1, 12, 6, 1, 1, 1, 12, 0}} //12inf 6 wide
 
 	for _, tt := range Tests {
 		actuala, actualb := numOfAttacks(tt.combatants, tt.attacks, tt.quantity, tt.formation, tt.firstHeight, tt.secondHeight, tt.fightExtraRank)
 		if actuala != tt.expecteda && actualb != tt.expectedb {
-			t.Errorf("numOfAttacks(%d, %d, %d, %d, %d, %d, %d): expected (%f, %f), actual (%f, %f)", tt.combatants, tt.attacks, tt.quantity, tt.formation, tt.firstHeight, tt.secondHeight, tt.fightExtraRank, tt.expecteda, tt.expectedb, actuala, actualb)
+			t.Errorf("numOfAttacks(%d, %d, %d, %d, %d, %d, %d): expected (%d, %d), actual (%d, %d)", tt.combatants, tt.attacks, tt.quantity, tt.formation, tt.firstHeight, tt.secondHeight, tt.fightExtraRank, tt.expecteda, tt.expectedb, actuala, actualb)
 		}
 	}
 }

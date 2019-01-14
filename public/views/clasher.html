@@ -175,6 +175,12 @@
                         <th>Break Chance</th>
                         <th>Friend Remaining</th>
                         <th>Enemy Remaining</th>
+                        <th></th>
+                        <th>Average Winner</th>
+                        <th>Average Win by</th>
+                        <th>Average Break Chance</th>
+                        <th>Average Friend Remaining</th>
+                        <th>Average Enemy Remaining</th>
                     </tr>
                     <tr>
                         <th><textarea readonly rows="1" cols="6">{{if .FightResults.WINNER}}Friendly{{else}}Enemy{{end}}</textarea></th>
@@ -182,6 +188,14 @@
                         <th><textarea readonly rows="1" cols="6">{{.FightResults.BreakChance}}%</textarea></th>
                         <th><textarea readonly rows="1" cols="6">{{.FightResults.FNUM}}</textarea></th>
                         <th><textarea readonly rows="1" cols="6">{{.FightResults.ENUM}}</textarea></th>
+
+                        <th></th>
+
+                        <th><textarea readonly rows="1" cols="6">{{if .AVGFightResults.WINNER}}Friendly{{else}}Enemy{{end}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.AVGFightResults.AMMOUNT}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.AVGFightResults.BreakChance}}%</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.AVGFightResults.FNUM}}</textarea></th>
+                        <th><textarea readonly rows="1" cols="6">{{.AVGFightResults.ENUM}}</textarea></th>
                     </tr>
                 </table>
             </fieldset>

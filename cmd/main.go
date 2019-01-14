@@ -17,7 +17,7 @@ func diceHandler(w http.ResponseWriter, r *http.Request) {
 
 //Dummy page to use for testing
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("Serving Hello World")
+	fmt.Print("Serving Hello World\n")
 
 	fmt.Fprintf(w, "For other pages please go to /dice or /clasher")
 }
