@@ -58,7 +58,7 @@ func renderDiceTemplate(w http.ResponseWriter, tmpl string, p *DicePage) {
 ChanceOfSuccess is a function for determining the chance of beating a certain value when rolling two dice. The second paramter is to determine if the user whishes to get under or over the threshold value. It also handles the concept of minimizing or maximising. Maximising is the act of rolling an additional dice and then discarding the lowest value for the total result. Minimising is the reverse. The last option is to allow rerolls in the evnt of a failed case.
 */
 func ChanceOfSuccess(threshold int, over bool, reroll bool, min int, max int) float64 {
-	iterations := 1000000
+	iterations := 1000
 	successes := 0
 
 	for i := 0; i < iterations; i++ {

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"runtime/pprof"
+	"os"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,7 +11,6 @@ import (
 
 	"github.com/duxbuse/Utilities"
 )
-
 
 func diceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving DiceRoller Page\n")
@@ -25,9 +27,22 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func clasherHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving Clasher Page\n")
 	Utilities.RenderClasher(w, r, "clasher")
+	
 }
-
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 func main() {
+	//Profiling
+	flag.Parse()
+    if *cpuprofile != "" {
+        f, err := os.Create(*cpuprofile)
+        if err != nil {
+            log.Fatal(err)
+        }
+        pprof.StartCPUProfile(f)
+        defer pprof.StopCPUProfile()
+    }
+
+	// Webserver
 	port := 9000
 	http.HandleFunc("/dice/", diceHandler)
 	http.HandleFunc("/clasher/", clasherHandler)
