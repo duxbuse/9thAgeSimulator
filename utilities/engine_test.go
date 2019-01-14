@@ -4,12 +4,13 @@ package Utilities
 
 import (
 	"math"
+	"math/rand"
 	"strconv"
 	"testing"
 )
 
 func TestFight(t *testing.T) {
-	// TODO:
+	rand.Seed(9001) //This is critical to make sure the tests pass no matter where they are run.
 
 	Tests := map[int]Results{}
 
@@ -81,9 +82,9 @@ func TestFight(t *testing.T) {
 
 	outcome1 := Outcome{
 		WINNER:      true,
-		AMMOUNT:     1,
-		BreakChance: "16.67",
-		FNUM:        20,
+		AMMOUNT:     2,
+		BreakChance: "58.34",
+		FNUM:        18,
 		ENUM:        22}
 
 	avgOutcome1 := Outcome{ //this is currently not checked and hence doesnt matter
@@ -115,12 +116,11 @@ func TestFight(t *testing.T) {
 		SpecialtiesStats:   uspecialtiesStatsNames,
 		SpecialtiesStatsOn: fight2specialtiesStatsOn}
 
-	//The dice gods hate this fight. The dread Judges normally win by 5. The Hold guardians kill 10 judges.
 	outcome2 := Outcome{
-		WINNER:      false,
-		AMMOUNT:     0,
-		BreakChance: "N/A", //TODO: figure out what this number actually should be. The hold guardians lose by 4 so are testing on DIS5
-		FNUM:        14,
+		WINNER:      true,
+		AMMOUNT:     6,
+		BreakChance: "91.64",
+		FNUM:        20,
 		ENUM:        3}
 
 	avgOutcome2 := Outcome{ //this is currently not checked and hence doesnt matter. But I did the maths and this is correct.
