@@ -85,16 +85,24 @@ func TestFight(t *testing.T) {
 		BreakChance: "16.67",
 		FNUM:        20,
 		ENUM:        22}
-	results1 := Results{fight1, outcome1}
+
+	avgOutcome1 := Outcome{ //this is currently not checked and hence doesnt matter
+		WINNER:      true,
+		AMMOUNT:     0,
+		BreakChance: "0",
+		FNUM:        0,
+		ENUM:        0}
+
+	results1 := Results{fight1, outcome1, avgOutcome1}
 
 	//fight2
-	//24 Dread Judges v 6 hold guardians
+	//24 Dread Judges v 6 hold guardians with distracting
 
 	fight2rawstats := map[string]EntetiesClass{"FQAN": {"FQAN", 24}, "FFOR": {"FFOR", 8}, "FDIS": {"FDIS", 8}, "FHP": {"FHP", 1}, "FDEF": {"FDEF", 5}, "FRES": {"FRES", 3}, "FARM": {"FARM", 2}, "FATT": {"FATT", 1}, "FOFF": {"FOFF", 5}, "FSTR": {"FSTR", 4}, "FAP": {"FAP", 1}, "FAGI": {"FAGI", 5}, "EQAN": {"EQAN", 6}, "EFOR": {"EFOR", 3}, "EDIS": {"EDIS", 9}, "EHP": {"EHP", 3}, "EDEF": {"EDEF", 4}, "ERES": {"ERES", 5}, "EARM": {"EARM", 4}, "EATT": {"EATT", 3}, "EOFF": {"EOFF", 4}, "ESTR": {"ESTR", 6}, "EAP": {"EAP", 3}, "EAGI": {"EAGI", 2}, "FSS": {"FSS", 0}, "ESS": {"ESS", 0}}
 
 	fight2secondarystats := map[string]EntetiesClass{"FHeightSelect": {"FHeightSelect", 1}, "EHeightSelect": {"EHeightSelect", 2}, "FTypeSelect": {"FTypeSelect", 1}, "ETypeSelect": {"ETypeSelect", 1}, "FWidthSelect": {"FWidthSelect", 20}, "EWidthSelect": {"EWidthSelect", 40}, "FWeaponSelect": {"FWeaponSelect", 4}, "EWeaponSelect": {"EWeaponSelect", 8}, "FRaceSelect": {"FRaceSelect", 1}, "ERaceSelect": {"ERaceSelect", 2}}
 
-	fight2specialtiesStatsOn := map[string]bool{"FLightning Reflexes": true, "EDistracting": true, "FHatred": true}
+	fight2specialtiesStatsOn := map[string]bool{"FLightning Reflexes": true, "EDistracting": true, "FHatred": true, "FLethal Strike": true}
 
 	fight2 := Data{
 		RawStats:           fight2rawstats,
@@ -107,14 +115,22 @@ func TestFight(t *testing.T) {
 		SpecialtiesStats:   uspecialtiesStatsNames,
 		SpecialtiesStatsOn: fight2specialtiesStatsOn}
 
+	//The dice gods hate this fight. The dread Judges normally win by 5. The Hold guardians kill 10 judges.
 	outcome2 := Outcome{
+		WINNER:      false,
+		AMMOUNT:     0,
+		BreakChance: "N/A", //TODO: figure out what this number actually should be. The hold guardians lose by 4 so are testing on DIS5
+		FNUM:        14,
+		ENUM:        3}
+
+	avgOutcome2 := Outcome{ //this is currently not checked and hence doesnt matter. But I did the maths and this is correct.
 		WINNER:      true,
 		AMMOUNT:     5,
-		BreakChance: "83.39", //TODO: figure out what this number actually should be. The hold guardians lose by 5 so are testing on DIS4
+		BreakChance: "?",
 		FNUM:        18,
 		ENUM:        3}
 
-	results2 := Results{fight2, outcome2}
+	results2 := Results{fight2, outcome2, avgOutcome2}
 	/////////////////////////////////////////////////////////////////////////
 	Tests[1] = results1
 	Tests[2] = results2

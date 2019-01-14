@@ -42,7 +42,7 @@ func fight(data Data) Outcome {
 	//first fights first
 	firstHeightSelection := data.SecondaryStats[string(order)+"HeightSelect"].Value
 	firstBaseWidthSelection := data.SecondaryStats[string(order)+"WidthSelect"].Value
-	firstBaseWidth, _ := strconv.Atoi(data.Width[firstBaseWidthSelection])
+	firstBaseWidth := firstBaseWidthSelection
 	firstFOR := data.RawStats[string(order)+"FOR"].Value
 	firstQAN := data.RawStats[string(order)+"QAN"].Value
 	firstHP := data.RawStats[string(order)+"HP"].Value
@@ -90,7 +90,7 @@ func fight(data Data) Outcome {
 
 	secondHeightSelection := data.SecondaryStats[string(notOrder)+"HeightSelect"].Value
 	secondBaseWidthSelection := data.SecondaryStats[string(notOrder)+"WidthSelect"].Value
-	secondBaseWidth, _ := strconv.Atoi(data.Width[secondBaseWidthSelection])
+	secondBaseWidth := secondBaseWidthSelection
 	secondFOR := data.RawStats[string(notOrder)+"FOR"].Value
 	secondQAN := data.RawStats[string(notOrder)+"QAN"].Value
 	secondHP := data.RawStats[string(notOrder)+"HP"].Value
@@ -282,7 +282,7 @@ func fight(data Data) Outcome {
 		breakchance = 1.0 - ChanceOfSuccess(threshold, false, firstBSB, 0, 0)
 	}
 	breakchanceString := "N/A"
-	if breakchance != 0.0 {
+	if breakchance != 0 {
 		breakchanceString = strconv.FormatFloat(breakchance*100, 'f', 2, 64)
 	}
 	if order == 'F' {
@@ -295,7 +295,8 @@ func fight(data Data) Outcome {
 
 func CombatRes(casualties int, quantity int, formation int, unitHeight int, bonuses int) int {
 
-	rankbonus := float64(ranks(quantity, formation, unitHeight) - 1) //first rank doesnt give a bonus
+	numOfRanks := ranks(quantity, formation, unitHeight)
+	rankbonus := float64(numOfRanks - 1) //first rank doesnt give a bonus
 	if rankbonus < 0.0 {
 		rankbonus = 0.0 //ensure you cant go negative
 	}
@@ -309,28 +310,29 @@ func hits(FATT int, FOFF int, EDEF int, parry bool, rerollINC int, modifier int)
 	hits := 0
 	sixes := 0
 	diff := FOFF - EDEF
+	if parry && diff < 0 {
+		diff-- //the enemy gets an extra point of ds with shield if normally higher
+	}
+	hit := 0.0
+	if diff >= 4 {
+		hit = 5.0
+	} else if diff > 0 {
+		hit = 4.0
+	} else if diff >= -3 {
+		hit = 3.0
+	} else if diff >= -7 {
+		hit = 2.0
+	} else {
+		hit = 1.0
+	}
+	if parry && hit > 3.0 {
+		hit = 3.0
+	}
+	hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
+	dice := 0
 	for i := 0; i < FATT; i++ {
-		if parry && diff < 0 {
-			diff-- //the enemy gets an extra point of ds with shield if normally higher
-		}
-		hit := 0.0
-		if diff >= 4 {
-			hit = 5.0
-		} else if diff > 0 {
-			hit = 4.0
-		} else if diff >= -3 {
-			hit = 3.0
-		} else if diff >= -7 {
-			hit = 2.0
-		} else {
-			hit = 1.0
-		}
-		if parry && hit > 3.0 {
-			hit = 3.0
-		}
-		hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
 
-		dice := RollDice()
+		dice = RollDice()
 		if dice >= int(7-hit) {
 			if dice == 6 {
 				sixes++
@@ -352,59 +354,28 @@ func hits(FATT int, FOFF int, EDEF int, parry bool, rerollINC int, modifier int)
 	return hits, sixes
 }
 
-// func hitChance(FOFF int, EDEF int, parry bool, rerollINC int, modifier int) float64 {
-// 	// rerollINC represents the values up to reroll out of 6 to reroll. EG rerollINC =  1 only rerolls values of 1, rerollINC = 6 rerolls all values.
-// 	//modifier can be +1 or -1 to represent hitting easier.
-// 	//TODO: potentialy use parry as an int so that things like can never be hit on better than a x+ can be quasi parry. Since parry is essentially cant be hit on better than a 4+
-// 	diff := FOFF - EDEF
-// 	if parry && diff < 0 {
-// 		diff-- //the enemy gets an extra point of ds with shield if normally higher
-// 	}
-// 	hit := 0.0
-// 	if diff >= 4 {
-// 		hit = 5.0
-// 	} else if diff > 0 {
-// 		hit = 4.0
-// 	} else if diff >= -3 {
-// 		hit = 3.0
-// 	} else if diff >= -7 {
-// 		hit = 2.0
-// 	} else {
-// 		hit = 1.0
-// 	}
-// 	if parry && hit > 3.0 {
-// 		hit = 3.0
-// 	}
-// 	hit = math.Min(math.Max(hit+float64(modifier), 1.0), 5.0) //hit value out of 6 that will hit
-
-// 	chance := hit / 6.0
-// 	failedchance := (6.0 - hit) / 6.0
-// 	rerollpercent := float64(rerollINC) / 6.0
-// 	percentToReroll := math.Min(failedchance, rerollpercent)
-
-// 	total := chance + percentToReroll*chance
-// 	return total
-// }
 func wounds(hits int, FSTR int, ERES int, rerollINC int, modifier int) (int, int) {
 	wounds := 0
 	sixes := 0
 	diff := FSTR - ERES
 	wound := 0.0
-	for i := 0; i < hits; i++ {
-		if diff >= 2 {
-			wound = 5.0
-		} else if diff >= 1 {
-			wound = 4.0
-		} else if diff == 0 {
-			wound = 3.0
-		} else if diff >= -1 {
-			wound = 2.0
-		} else {
-			wound = 1.0
-		}
-		wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
 
-		dice := RollDice()
+	if diff >= 2 {
+		wound = 5.0
+	} else if diff >= 1 {
+		wound = 4.0
+	} else if diff == 0 {
+		wound = 3.0
+	} else if diff >= -1 {
+		wound = 2.0
+	} else {
+		wound = 1.0
+	}
+	wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
+	dice := 0
+	for i := 0; i < hits; i++ {
+
+		dice = RollDice()
 		if dice >= int(7-wound) {
 			if dice == 6 {
 				sixes++
@@ -426,41 +397,18 @@ func wounds(hits int, FSTR int, ERES int, rerollINC int, modifier int) (int, int
 	return wounds, sixes
 }
 
-// func woundChance(FSTR int, ERES int, rerollINC int, modifier int) float64 {
-// 	diff := FSTR - ERES
-// 	wound := 0.0
-// 	if diff >= 2 {
-// 		wound = 5.0
-// 	} else if diff >= 1 {
-// 		wound = 4.0
-// 	} else if diff == 0 {
-// 		wound = 3.0
-// 	} else if diff >= -1 {
-// 		wound = 2.0
-// 	} else {
-// 		wound = 1.0
-// 	}
-// 	wound = math.Min(math.Max(wound+float64(modifier), 1.0), 5.0) //wound value out of 6 that will wound
-
-// 	chance := wound / 6.0
-// 	failedchance := (6.0 - wound) / 6.0
-// 	rerollpercent := float64(rerollINC) / 6.0
-// 	percentToReroll := math.Min(failedchance, rerollpercent)
-
-// 	total := chance + percentToReroll*chance
-// 	return total
-// }
 func armourFails(wounds int, FAP int, EARM int) int { //TODO: rerolls both failed and successfull
 	armour := EARM - FAP
 	fails := 0
+	if armour > 5 {
+		armour = 5
+	} else if armour < 0 {
+		armour = 0
+	}
+	dice := 0
 	for i := 0; i < wounds; i++ {
 
-		if armour > 5 {
-			armour = 5
-		} else if armour < 0 {
-			armour = 0
-		}
-		dice := RollDice()
+		dice = RollDice()
 		if dice < int(7-armour) {
 			//great its a hit
 			fails++
@@ -469,15 +417,6 @@ func armourFails(wounds int, FAP int, EARM int) int { //TODO: rerolls both faile
 	return fails
 }
 
-// func armourFailChance(FAP int, EARM int) float64 { //TODO: rerolls both failed and successfull
-// 	chance := EARM - FAP
-// 	if chance > 5 {
-// 		chance = 5
-// 	} else if chance < 0 {
-// 		chance = 0
-// 	}
-// 	return (6 - float64(chance)) / 6
-// }
 func fightOrder(FAGI int, EAGI int) rune {
 	if EAGI > FAGI {
 		return 'E' //Enemy first
