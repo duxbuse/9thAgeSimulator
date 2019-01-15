@@ -5,7 +5,6 @@ Tool to help Math Hammer
 
 - Rewrite to allow for multiple combatants(including mounts) This may look like get all combatants. Set modifiers, then action in order.
 - Crumble
-- Need to allow for charging
 - Extra specalties for various races
 - Mounts
 - Multiple rounds of combat
