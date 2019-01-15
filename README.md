@@ -1,4 +1,5 @@
 # 9thAge Battle Simulator
+
 Tool to help Math Hammer
 
 ## TODO
@@ -16,7 +17,8 @@ Tool to help Math Hammer
 - Differentiate ageis and fortitude saves
 - Reroll passes for things like to wound and armour saves
 
-## Ways to run the app:
+## Ways to run the app
+
 Note: the first 3 options will expose the app on `localhost:9000`
 
 Method | Location | Command
@@ -26,11 +28,11 @@ Docker | Local - Docker| <ol> <li> `docker build -t duxbuse/9thAgeSimulator .`</
 Minikube | Local - Kubernetes| <ol> <li> `docker build -t duxbuse/9thAgeSimulator .`</li> <li>`docker stack deploy -c docker-compose.yml 9thAgeSimulator`</li>
 Google Cloud Platform | Cloud | <ol> <li>`cd Step1.google-container-cluster.terraform/`</li> <li>`terraform init` </li><li>`terraform apply` -> `yes`\*\*</li><li>`cd ../Step2.google-cloudbuild-trigger.terraform/` </li><li>`terraform init` </li><li>`terraform apply` -> `yes` \*\* </li></ol>
 
-### It should be noted that deploying to cloud has a few pre-requisites.
+### It should be noted that deploying to cloud has a few pre-requisites
 
 ** This will require a `xxx.json` key file for a service account that you will need to create manually with `Editor` permissions. It will also need `Source Repository Administrator` roles.
 
-```
+```yml
 provider "google" {
   project     = "${var.project}"
   credentials = "${file(">>9thAgeSimulator-220503-8497483a16e9.json<<")}"
@@ -38,6 +40,7 @@ provider "google" {
   zone        = "${var.zone}"
 }
 ```
+
 You will likley need to run terraform a few times with errors telling you to enable various api's but that is ok.
 You will also need to modify the permissions of the `cloudbuild.gserviceaccount.com` account to also allow `Kubernetes Engine Admin` permissions which will alow the cloudbuild to deploy images that succeed. As well as changing the `vars.tf` in step 1 to your project name.
 
@@ -53,5 +56,6 @@ At the end of this you will have a CI pipe line that will run go tests before bu
 For new project the kubernetes deployment yaml needs to point to the new GCR created for your project so with will need to be updated if you spin this up yourself
 
 ## Debugging
+
 It is helpfull to run dry build of the cloud builder
 `cloud-build-local --dryrun=false --substitutions=REPO_NAME='test-repo',REVISION_ID='test-revision'  .`

@@ -1,4 +1,4 @@
-package Utilities
+package utilities
 
 // TODO: need to re write the tests since no longer using chance but actual dice.
 

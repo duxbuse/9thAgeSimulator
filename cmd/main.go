@@ -9,12 +9,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/duxbuse/Utilities"
+	"github.com/duxbuse/utilities"
 )
 
 func diceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving DiceRoller Page\n")
-	Utilities.RenderDiceRoller(w, r, "dice")
+	utilities.RenderDiceRoller(w, r, "dice")
 }
 
 //Dummy page to use for testing
@@ -26,7 +26,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func clasherHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("Serving Clasher Page\n")
-	Utilities.RenderClasher(w, r, "clasher")
+	utilities.RenderClasher(w, r, "clasher")
 	
 }
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
