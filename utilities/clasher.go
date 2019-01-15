@@ -26,9 +26,10 @@ type Data struct {
 	RawStats       map[string]EntetiesClass
 	SecondaryStats map[string]EntetiesClass
 
-	Weapon             map[int]string
-	Height             map[int]string
-	Type               map[int]string
+	Weapon map[int]string
+	Height map[int]string
+	//TODO: make use of this, impact hits are hard due to the various types untill a good soloution leave commented out.
+	// Type               map[int]string
 	Width              map[int]string
 	Races              map[int]string
 	SpecialtiesStats   map[string]string
@@ -78,12 +79,12 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 		2: "Large",
 		3: "Gigantic"}
 
-	// Set up unit type
-	utype := map[int]string{
-		1: "Infantry",
-		2: "Beast",
-		3: "Cavalry",
-		4: "Construct"}
+	// // Set up unit type
+	// utype := map[int]string{
+	// 	1: "Infantry",
+	// 	2: "Beast",
+	// 	3: "Cavalry",
+	// 	4: "Construct"}
 
 	// Set up base width in mm
 	ubase := map[int]string{
@@ -112,7 +113,7 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 		4: "OK",
 		5: "OnG"}
 
-	specialtiesStatsNames := map[string]string{"Hatred": "any", "Distracting": "any", "Lightning Reflexes": "any", "Killer Instinct": "DE", "Shield Wall": "DH", "Lethal Strike": "any", "Born to Fight": "OnG", "Black Standard of Zagvozd": "VC"}
+	specialtiesStatsNames := map[string]string{"Champion": "any", "Musician": "any", "Standard Bearer": "any", "Charging": "any", "Hatred": "any", "Distracting": "any", "Lightning Reflexes": "any", "Killer Instinct": "DE", "Shield Wall": "DH", "Lethal Strike": "any", "Born to Fight": "OnG", "Black Standard of Zagvozd": "VC"}
 
 	specialtiesStatsOn := map[string]bool{}
 	for k := range specialtiesStatsNames {
@@ -120,7 +121,7 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 		specialtiesStatsOn["E"+k] = len(r.FormValue("E"+k)) > 0
 	}
 	// Save all unit data as one object
-	data := Data{RawStats: urawstats, SecondaryStats: usecondarystats, Weapon: uweapon, Height: uheight, Type: utype, Width: ubase, Races: races, SpecialtiesStats: specialtiesStatsNames, SpecialtiesStatsOn: specialtiesStatsOn}
+	data := Data{RawStats: urawstats, SecondaryStats: usecondarystats, Weapon: uweapon, Height: uheight, Width: ubase, Races: races, SpecialtiesStats: specialtiesStatsNames, SpecialtiesStatsOn: specialtiesStatsOn}
 
 	outcomes := make([]Outcome, 100) //simulate 100 fights
 	for i := 0; i < 100; i++ {

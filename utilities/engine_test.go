@@ -25,12 +25,12 @@ func TestFight(t *testing.T) {
 		2: "Large",
 		3: "Gigantic"}
 
-	// Set up unit type
-	utype := map[int]string{
-		1: "Infantry",
-		2: "Beast",
-		3: "Cavalry",
-		4: "Construct"}
+	// // Set up unit type
+	// utype := map[int]string{
+	// 	1: "Infantry",
+	// 	2: "Beast",
+	// 	3: "Cavalry",
+	// 	4: "Construct"}
 
 	// Set up base width in mm
 	ubase := map[int]string{
@@ -74,11 +74,11 @@ func TestFight(t *testing.T) {
 	fight1specialtiesStatsOn := map[string]bool{"FLightning Reflexes": true, "FKiller Instinct": true, "EShield Wall": true}
 
 	fight1 := Data{
-		RawStats:           fight1rawstats,
-		SecondaryStats:     fight1secondarystats,
-		Weapon:             uweapon,
-		Height:             uheight,
-		Type:               utype,
+		RawStats:       fight1rawstats,
+		SecondaryStats: fight1secondarystats,
+		Weapon:         uweapon,
+		Height:         uheight,
+		// Type:               utype,
 		Width:              ubase,
 		Races:              uraces,
 		SpecialtiesStats:   uspecialtiesStatsNames,
@@ -110,11 +110,11 @@ func TestFight(t *testing.T) {
 	fight2specialtiesStatsOn := map[string]bool{"FLightning Reflexes": true, "EDistracting": true, "FHatred": true, "FLethal Strike": true}
 
 	fight2 := Data{
-		RawStats:           fight2rawstats,
-		SecondaryStats:     fight2secondarystats,
-		Weapon:             uweapon,
-		Height:             uheight,
-		Type:               utype,
+		RawStats:       fight2rawstats,
+		SecondaryStats: fight2secondarystats,
+		Weapon:         uweapon,
+		Height:         uheight,
+		// Type:               utype,
 		Width:              ubase,
 		Races:              uraces,
 		SpecialtiesStats:   uspecialtiesStatsNames,

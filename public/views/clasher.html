@@ -43,13 +43,7 @@
                             selected {{end}}>{{$element}}</option>
                         {{end}}
                     </select>
-                    <label>Unit Type</label>
-                    <select name="FTypeSelect">
-                        {{range $index, $element := .UnitData.Type}}
-                        <option value="{{$index}}" {{if eq ($index) ( $.UnitData.SecondaryStats.FTypeSelect.Value) }}
-                            selected {{end}}>{{$element}}</option>
-                        {{end}}
-                    </select>
+                   
                     <label>Base width</label>
                     <select name="FWidthSelect">
                         {{range $index, $element := .UnitData.Width}}
@@ -116,13 +110,7 @@
                             selected {{end}}>{{$element}}</option>
                         {{end}}
                     </select>
-                    <label>Unit Type</label>
-                    <select name="ETypeSelect">
-                        {{range $index, $element := .UnitData.Type}}
-                        <option value="{{$index}}" {{if eq ($index) ($.UnitData.SecondaryStats.ETypeSelect.Value) }}
-                            selected {{end}}>{{$element}}</option>
-                        {{end}}
-                    </select>
+                    
                     <label>Base width</label>
                     <select name="EWidthSelect">
                         {{range $index, $element := .UnitData.Width}}

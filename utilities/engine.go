@@ -6,7 +6,6 @@ import (
 )
 
 func fight(data Data) Outcome {
-	// TODO: Charging friend/enemyAGI++
 	friendAGI := data.RawStats["FAGI"].Value
 	friendLR := data.SpecialtiesStatsOn["FLightning Reflexes"]
 	enemyAGI := data.RawStats["EAGI"].Value
@@ -26,6 +25,13 @@ func fight(data Data) Outcome {
 		}
 
 	}
+	if data.SpecialtiesStatsOn["FCharging"] {
+		friendAGI++
+	}
+	if data.SpecialtiesStatsOn["ECharging"] {
+		enemyAGI++
+	}
+
 	//who fights first
 	beforeOrder := fightOrder(friendAGI, enemyAGI)
 	order := beforeOrder
@@ -61,32 +67,9 @@ func fight(data Data) Outcome {
 	firstWoundReroll := 0
 	firstFIAR := 0
 	firstLethalStrike := false
-
-	//Make changes for firsts weapons
-	switch data.SecondaryStats[string(order)+"WeaponSelect"].Value {
-	case 1: //Sword and Board
-		firstParry = true
-	case 2: //Spear
-		firstFIAR++
-		firstAP++
-	case 3: //Halberd
-		firstSTR++
-		firstAP++
-	case 4: //Greatweapon
-		firstSTR += 2
-		firstAP += 2
-		//AGI allready handled
-	case 5: //Paired Weapons
-		firstOFF++
-		firstATT++
-	case 6: //Light Lance TODO: when we have charing this needs to be conditional
-		firstSTR++
-		firstAP++
-	case 7: //Lance
-		firstSTR += 2
-		firstAP += 2
-	case 8: //none
-	}
+	firstChamp := false
+	firstCombatResBonus := 0
+	firstCharging := false
 
 	secondHeightSelection := data.SecondaryStats[string(notOrder)+"HeightSelect"].Value
 	secondBaseWidthSelection := data.SecondaryStats[string(notOrder)+"WidthSelect"].Value
@@ -110,10 +93,37 @@ func fight(data Data) Outcome {
 	secondWoundReroll := 0
 	secondFIAR := 0
 	secondLethalStrike := false
+	secondChamp := false
+	secondCombatResBonus := 0
+	secondCharging := false
 
 	for k, v := range data.SpecialtiesStatsOn { //set each specialty
 		if v {
 			switch k[1:] {
+			case "Charging":
+				if []rune(k)[0] == order {
+					firstCharging = true
+					firstCombatResBonus++
+					//agi handled seperatly
+					//TODO: make agi a normal stat and then figure out the fight order after all stats have been modified this will also allow for multiple combatants.
+				} else if []rune(k)[0] == notOrder {
+					secondCharging = true
+					secondCombatResBonus++
+				}
+
+			case "Champion":
+				if []rune(k)[0] == order {
+					firstChamp = true
+				} else if []rune(k)[0] == notOrder {
+					secondChamp = true
+				}
+			case "Standard Bearer":
+				if []rune(k)[0] == order {
+					firstCombatResBonus++
+				} else if []rune(k)[0] == notOrder {
+					secondCombatResBonus++
+				}
+
 			case "Hatred":
 				if []rune(k)[0] == order {
 					firstHitReroll = 6 //reroll upto all values
@@ -181,6 +191,41 @@ func fight(data Data) Outcome {
 		}
 	}
 
+	//Make changes for firsts weapons
+	switch data.SecondaryStats[string(order)+"WeaponSelect"].Value {
+	case 1: //Sword and Board
+		firstParry = true
+	case 2: //Spear
+		firstFIAR++
+		firstAP++
+		if !firstCharging && secondCharging {
+			firstAP++
+		}
+	case 3: //Halberd
+		firstSTR++
+		firstAP++
+	case 4: //Greatweapon
+		firstSTR += 2
+		firstAP += 2
+		//AGI allready handled
+	case 5: //Paired Weapons
+		firstOFF++
+		firstATT++
+	case 6: //Light Lance
+		if firstCharging {
+			firstSTR++
+			firstAP++
+		}
+
+	case 7: //Lance
+		if firstCharging {
+			firstSTR += 2
+			firstAP += 2
+		}
+
+	case 8: //none
+	}
+
 	//Make changes for seconds weapons
 	switch data.SecondaryStats[string(notOrder)+"WeaponSelect"].Value {
 	case 1: //Sword and Board
@@ -191,7 +236,10 @@ func fight(data Data) Outcome {
 	case 2: //Spear
 		secondFIAR++
 		secondAP++
-		//TODO: if being charged increase ap
+		if !secondCharging && firstCharging {
+			firstAP++
+		}
+
 	case 3: //Halberd
 		secondSTR++
 		secondAP++
@@ -204,11 +252,16 @@ func fight(data Data) Outcome {
 		secondATT++
 		firstParry = false
 	case 6: //Light Lance
-		secondSTR++
-		secondAP++
+		if secondCharging {
+			secondSTR++
+			secondAP++
+		}
 	case 7: //Lance
-		secondSTR += 2
-		secondAP += 2
+		if secondCharging {
+			secondSTR += 2
+			secondAP += 2
+		}
+
 	case 8: //none
 	}
 
@@ -219,9 +272,13 @@ func fight(data Data) Outcome {
 	firstCombatants, secondCombatants := numOfCombatants(firstFOR, firstQAN, firstBaseWidth, secondFOR, secondQAN, secondBaseWidth)
 
 	firstAttacks, firstBonusHits := numOfAttacks(firstCombatants, firstATT, firstQAN, firstFOR, firstHeightSelection, secondHeightSelection, firstFIAR)
+	if firstChamp {
+		firstAttacks++
+	}
 
 	firstHits, firstHitSixes := hits(firstAttacks, firstOFF, secondDEF, secondParry, firstHitReroll, firstHitMod)
 	firstHits += firstBonusHits
+
 	firstWounds, firstWoundSixes := wounds((firstHits + firstHitSixes), firstSTR, secondRES, 0, firstWoundReroll) //add some logic for poison and battle focus
 	firstArmourFails := 0
 	if firstLethalStrike {
@@ -239,6 +296,10 @@ func fight(data Data) Outcome {
 	}
 
 	secondAttacks, secondBonusHits := numOfAttacks(secondCombatants, secondATT, secondQAN, secondFOR, secondHeightSelection, firstHeightSelection, secondFIAR)
+
+	if secondChamp {
+		secondAttacks++
+	}
 
 	secondHits, secondHitSixes := hits(secondAttacks, secondOFF, firstDEF, firstParry, secondHitReroll, secondHitMod)
 	secondHits += secondBonusHits
@@ -258,8 +319,9 @@ func fight(data Data) Outcome {
 		secondQAN = secondQAN - int(math.Floor(float64(firstCasualties)/float64(secondHP)))
 	}
 
-	firstCombatRes := CombatRes(firstCasualties, firstQAN, firstFOR, firstHeightSelection, 0) //TODO: bonuses need work like having a banner or charging.
-	secondCombatRes := CombatRes(secondCasualties, secondQAN, secondFOR, secondHeightSelection, 0)
+	firstCombatRes := CombatRes(firstCasualties, firstQAN, firstFOR, firstHeightSelection, firstCombatResBonus)
+
+	secondCombatRes := CombatRes(secondCasualties, secondQAN, secondFOR, secondHeightSelection, secondCombatResBonus)
 
 	combatResSum := firstCombatRes - secondCombatRes
 	firstRanks := ranks(firstQAN, firstFOR, firstHeightSelection)
