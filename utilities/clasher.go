@@ -123,8 +123,8 @@ func RenderClasher(w http.ResponseWriter, r *http.Request, tmpl string) {
 	// Save all unit data as one object
 	data := Data{RawStats: urawstats, SecondaryStats: usecondarystats, Weapon: uweapon, Height: uheight, Width: ubase, Races: races, SpecialtiesStats: specialtiesStatsNames, SpecialtiesStatsOn: specialtiesStatsOn}
 
-	outcomes := make([]Outcome, 100) //simulate 100 fights
-	for i := 0; i < 100; i++ {
+	outcomes := make([]Outcome, 1000) //simulate 1000 fights
+	for i := 0; i < 1000; i++ {
 		outcomes[i] = fight(data)
 	}
 
